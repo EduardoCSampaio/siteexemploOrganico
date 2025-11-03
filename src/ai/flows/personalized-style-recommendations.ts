@@ -1,11 +1,11 @@
 'use server';
 
 /**
- * @fileOverview Provides personalized style recommendations based on user preferences, current trends, and item availability.
+ * @fileOverview Fornece recomendações de estilo personalizadas com base nas preferências do usuário, tendências atuais e disponibilidade de itens.
  *
- * - getPersonalizedStyleRecommendations - A function that retrieves personalized style recommendations for a user.
- * - PersonalizedStyleRecommendationsInput - The input type for the getPersonalizedStyleRecommendations function.
- * - PersonalizedStyleRecommendationsOutput - The return type for the getPersonalizedStyleRecommendations function.
+ * - getPersonalizedStyleRecommendations - Uma função que recupera recomendações de estilo personalizadas para um usuário.
+ * - PersonalizedStyleRecommendationsInput - O tipo de entrada para a função getPersonalizedStyleRecommendations.
+ * - PersonalizedStyleRecommendationsOutput - O tipo de retorno para a função getPersonalizedStyleRecommendations.
  */
 
 import {ai} from '@/ai/genkit';
@@ -15,14 +15,14 @@ const PersonalizedStyleRecommendationsInputSchema = z.object({
   userPreferences: z
     .string()
     .describe(
-      'A description of the users style preferences, including preferred colors, styles, and brands.'
+      'Uma descrição das preferências de estilo do usuário, incluindo cores, estilos e marcas preferidas.'
     ),
   currentTrends: z
     .string()
-    .describe('A description of the current fashion trends.'),
+    .describe('Uma descrição das tendências da moda atuais.'),
   itemAvailability: z
     .string()
-    .describe('A list of available clothing items and their details.'),
+    .describe('Uma lista de itens de vestuário disponíveis e seus detalhes.'),
 });
 export type PersonalizedStyleRecommendationsInput = z.infer<
   typeof PersonalizedStyleRecommendationsInputSchema
@@ -31,7 +31,7 @@ export type PersonalizedStyleRecommendationsInput = z.infer<
 const PersonalizedStyleRecommendationsOutputSchema = z.object({
   recommendations: z
     .array(z.string())
-    .describe('A list of personalized style recommendations.'),
+    .describe('Uma lista de recomendações de estilo personalizadas.'),
 });
 export type PersonalizedStyleRecommendationsOutput = z.infer<
   typeof PersonalizedStyleRecommendationsOutputSchema
@@ -51,22 +51,22 @@ const personalizedStyleRecommendationsPrompt = ai.definePrompt({
   output: {
     schema: PersonalizedStyleRecommendationsOutputSchema,
   },
-  prompt: `You are a personal stylist who provides personalized style recommendations based on user preferences, current trends, and item availability.
+  prompt: `Você é um estilista pessoal que fornece recomendações de estilo personalizadas com base nas preferências do usuário, tendências atuais e disponibilidade de itens.
 
-  User Preferences: {{{userPreferences}}}
-  Current Trends: {{{currentTrends}}}
-  Item Availability: {{{itemAvailability}}}
+  Preferências do Usuário: {{{userPreferences}}}
+  Tendências Atuais: {{{currentTrends}}}
+  Disponibilidade de Itens: {{{itemAvailability}}}
 
-  Based on the above information, provide a list of personalized style recommendations.
-  Format your output as a JSON object with a "recommendations" field that contains an array of strings.
-  Each string should be a single style recommendation, formatted as a complete sentence.
-  The total number of recommendations should be between 3 and 5.
-  Do not repeat recommendations.
-  Be specific and provide actionable recommendations.
-  Include specific clothing items from the available items when possible.
-  Use markdown formatting for each recommendation.
-  Consider the user's preferences, current trends, and item availability when making recommendations.
-  Be creative and provide unique and stylish recommendations.
+  Com base nas informações acima, forneça uma lista de recomendações de estilo personalizadas.
+  Formate sua saída como um objeto JSON com um campo "recommendations" que contém um array de strings.
+  Cada string deve ser uma única recomendação de estilo, formatada como uma frase completa.
+  O número total de recomendações deve ser entre 3 e 5.
+  Não repita recomendações.
+  Seja específico e forneça recomendações acionáveis.
+  Inclua itens de vestuário específicos dos itens disponíveis, quando possível.
+  Use a formatação markdown para cada recomendação.
+  Considere as preferências do usuário, as tendências atuais e a disponibilidade de itens ao fazer recomendações.
+  Seja criativo e forneça recomendações únicas e estilosas.
 `,
 });
 

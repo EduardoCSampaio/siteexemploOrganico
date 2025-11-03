@@ -8,7 +8,9 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { getOutfitAction, getRecommendationsAction } from './actions';
-import type { GenerateOutfitInspirationOutput, PersonalizedStyleRecommendationsOutput } from '@/ai/flows/generate-outfit-inspiration';
+import type { GenerateOutfitInspirationOutput } from '@/ai/flows/generate-outfit-inspiration';
+import type { PersonalizedStyleRecommendationsOutput } from '@/ai/flows/personalized-style-recommendations';
+
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,12 +22,12 @@ import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const recommendationsSchema = z.object({
-  userPreferences: z.string().min(10, "Please describe your style in a bit more detail."),
+  userPreferences: z.string().min(10, "Por favor, descreva seu estilo com um pouco mais de detalhes."),
 });
 type RecommendationsFormValues = z.infer<typeof recommendationsSchema>;
 
 const outfitSchema = z.object({
-  occasion: z.string().min(3, "Please specify the occasion."),
+  occasion: z.string().min(3, "Por favor, especifique a ocasião."),
   userPreferences: z.string().optional(),
 });
 type OutfitFormValues = z.infer<typeof outfitSchema>;
@@ -49,7 +51,7 @@ export function StyleAdvisorClient() {
     setRecommendations(null);
     const result = await getRecommendationsAction(data);
     if (result.error) {
-      toast({ variant: 'destructive', title: 'Error', description: result.error });
+      toast({ variant: 'destructive', title: 'Erro', description: result.error });
     } else {
       setRecommendations(result.data);
     }
@@ -61,9 +63,8 @@ export function StyleAdvisorClient() {
     setOutfit(null);
     const result = await getOutfitAction(data);
     if (result.error) {
-      toast({ variant: 'destructive', title: 'Error', description: result.error });
+      toast({ variant: 'destructive', title: 'Erro', description: result.error });
     } else {
-        // @ts-ignore TODO: Fix type incompatibility
       setOutfit(result.data);
     }
     setIsLoading(false);
@@ -72,16 +73,16 @@ export function StyleAdvisorClient() {
   return (
     <Tabs defaultValue="outfit" className="w-full">
       <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="outfit"><Shirt className="mr-2 h-4 w-4" /> Outfit Generator</TabsTrigger>
+        <TabsTrigger value="outfit"><Shirt className="mr-2 h-4 w-4" /> Gerador de Looks</TabsTrigger>
         <TabsTrigger value="recommendations"><Wand2 className="mr-2 h-4 w-4" /> Personal Shopper</TabsTrigger>
       </TabsList>
 
-      {/* Outfit Generator */}
+      {/* Gerador de Looks */}
       <TabsContent value="outfit">
         <Card>
           <CardHeader>
-            <CardTitle>AI Outfit Generator</CardTitle>
-            <CardDescription>Tell us the occasion, and we'll create the perfect outfit for you.</CardDescription>
+            <CardTitle>Gerador de Looks com IA</CardTitle>
+            <CardDescription>Diga-nos a ocasião e nós criaremos o look perfeito para você.</CardDescription>
           </CardHeader>
           <Form {...outfitForm}>
             <form onSubmit={outfitForm.handleSubmit(onOutfitSubmit)}>
@@ -91,9 +92,9 @@ export function StyleAdvisorClient() {
                   name="occasion"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Occasion</FormLabel>
+                      <FormLabel>Ocasião</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g., Summer wedding, casual brunch, business meeting" {...field} />
+                        <Input placeholder="Ex: Casamento de verão, brunch casual, reunião de negócios" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -104,9 +105,9 @@ export function StyleAdvisorClient() {
                   name="userPreferences"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Preferences (Optional)</FormLabel>
+                      <FormLabel>Preferências (Opcional)</FormLabel>
                       <FormControl>
-                        <Textarea placeholder="e.g., I prefer bright colors, comfortable shoes, and modern styles." {...field} />
+                        <Textarea placeholder="Ex: Prefiro cores vibrantes, sapatos confortáveis e estilos modernos." {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -116,7 +117,7 @@ export function StyleAdvisorClient() {
               <CardFooter>
                 <Button type="submit" disabled={isLoading}>
                   {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Shirt className="mr-2 h-4 w-4" />}
-                  Generate Outfit
+                  Gerar Look
                 </Button>
               </CardFooter>
             </form>
@@ -125,13 +126,13 @@ export function StyleAdvisorClient() {
         {isLoading && !outfit && (
              <div className="text-center p-8 mt-4 bg-card rounded-lg">
                 <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
-                <p className="mt-4 text-lg text-muted-foreground">Our AI stylist is crafting your look...</p>
+                <p className="mt-4 text-lg text-muted-foreground">Nosso estilista de IA está criando seu look...</p>
             </div>
         )}
         {outfit && (
           <Card className="mt-6">
             <CardHeader>
-              <CardTitle>Your AI-Curated Outfit</CardTitle>
+              <CardTitle>Seu Look Curado por IA</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="mb-6 text-lg text-muted-foreground">{outfit.outfitDescription}</p>
@@ -145,8 +146,8 @@ export function StyleAdvisorClient() {
                       <h4 className="font-semibold">{item.name}</h4>
                       <p className="text-sm text-muted-foreground mt-1">{item.description}</p>
                       <div className="flex justify-between items-center mt-4">
-                        <p className="font-bold text-lg text-primary">${item.price.toFixed(2)}</p>
-                        <Button variant="outline" size="sm">View Item</Button>
+                        <p className="font-bold text-lg text-primary">R$ {item.price.toFixed(2).replace('.', ',')}</p>
+                        <Button variant="outline" size="sm">Ver Item</Button>
                       </div>
                     </div>
                   </Card>
@@ -161,8 +162,8 @@ export function StyleAdvisorClient() {
       <TabsContent value="recommendations">
         <Card>
           <CardHeader>
-            <CardTitle>AI Personal Shopper</CardTitle>
-            <CardDescription>Describe your style, and we'll suggest items you'll love from our collection.</CardDescription>
+            <CardTitle>Personal Shopper com IA</CardTitle>
+            <CardDescription>Descreva seu estilo e nós sugeriremos itens da nossa coleção que você vai amar.</CardDescription>
           </CardHeader>
           <Form {...recommendationsForm}>
             <form onSubmit={recommendationsForm.handleSubmit(onRecommendationsSubmit)}>
@@ -172,9 +173,9 @@ export function StyleAdvisorClient() {
                   name="userPreferences"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Your Style Profile</FormLabel>
+                      <FormLabel>Seu Perfil de Estilo</FormLabel>
                       <FormControl>
-                        <Textarea rows={4} placeholder="e.g., I love a minimalist look with neutral colors. I mostly wear comfortable, high-quality basics. My favorite brands are..." {...field} />
+                        <Textarea rows={4} placeholder="Ex: Eu amo um look minimalista com cores neutras. Eu visto principalmente básicos confortáveis e de alta qualidade. Minhas marcas favoritas são..." {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -184,7 +185,7 @@ export function StyleAdvisorClient() {
               <CardFooter>
                 <Button type="submit" disabled={isLoading}>
                     {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
-                  Get Recommendations
+                  Obter Recomendações
                 </Button>
               </CardFooter>
             </form>
@@ -193,13 +194,13 @@ export function StyleAdvisorClient() {
          {isLoading && !recommendations && (
              <div className="text-center p-8 mt-4 bg-card rounded-lg">
                 <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
-                <p className="mt-4 text-lg text-muted-foreground">Analyzing your style...</p>
+                <p className="mt-4 text-lg text-muted-foreground">Analisando seu estilo...</p>
             </div>
         )}
         {recommendations && (
           <Card className="mt-6">
             <CardHeader>
-              <CardTitle>Based On Your Style...</CardTitle>
+              <CardTitle>Com Base no Seu Estilo...</CardTitle>
             </CardHeader>
             <CardContent>
                 <ul className="space-y-4">

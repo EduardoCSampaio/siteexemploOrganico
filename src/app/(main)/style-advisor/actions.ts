@@ -20,7 +20,7 @@ export async function getOutfitAction(
     return { data: output, error: null };
   } catch (error) {
     console.error("Error in generateOutfitInspiration flow:", error);
-    return { data: null, error: "Failed to generate outfit inspiration. Please try again." };
+    return { data: null, error: "Falha ao gerar inspiração de look. Por favor, tente novamente." };
   }
 }
 
@@ -30,13 +30,13 @@ export async function getRecommendationsAction(
   try {
     const fullInput: PersonalizedStyleRecommendationsInput = {
         ...input,
-        currentTrends: "Current trends include minimalist designs, sustainable fabrics, and bold, monochromatic color palettes. Oversized silhouettes and vintage-inspired pieces are also popular.",
-        itemAvailability: products.map(p => `${p.name} (Category: ${p.category}, Price: $${p.price})`).join(', '),
+        currentTrends: "As tendências atuais incluem designs minimalistas, tecidos sustentáveis e paletas de cores ousadas e monocromáticas. Silhuetas oversized e peças de inspiração vintage também são populares.",
+        itemAvailability: products.map(p => `${p.name} (Categoria: ${p.category}, Preço: R$${p.price})`).join(', '),
     }
     const output = await getPersonalizedStyleRecommendations(fullInput);
     return { data: output, error: null };
   } catch (error) {
     console.error("Error in getPersonalizedStyleRecommendations flow:", error);
-    return { data: null, error: "Failed to get style recommendations. Please try again." };
+    return { data: null, error: "Falha ao obter recomendações de estilo. Por favor, tente novamente." };
   }
 }

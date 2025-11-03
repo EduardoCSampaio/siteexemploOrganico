@@ -19,7 +19,7 @@ function ProductCard({ product }: { product: (typeof products)[0] }) {
         </CardContent>
         <div className="p-4 border-t">
           <h3 className="font-semibold text-lg">{product.name}</h3>
-          <p className="text-muted-foreground mt-1">${product.price.toFixed(2)}</p>
+          <p className="text-muted-foreground mt-1">R$ {product.price.toFixed(2).replace('.', ',')}</p>
         </div>
       </Card>
     </Link>
@@ -30,9 +30,9 @@ export default function ProductsPage() {
   return (
     <div className="container py-12">
       <div className="text-center mb-12">
-        <h1 className="font-headline text-4xl md:text-5xl font-bold">Shop Our Collection</h1>
+        <h1 className="font-headline text-4xl md:text-5xl font-bold">Nossa Coleção</h1>
         <p className="mt-3 max-w-2xl mx-auto text-lg text-muted-foreground">
-          Discover pieces that are timeless, elegant, and uniquely you.
+          Descubra peças atemporais, elegantes e com a sua cara.
         </p>
       </div>
       
