@@ -42,6 +42,10 @@ export default function AdminLoginPage() {
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
   });
 
   const onSubmit: SubmitHandler<LoginFormValues> = async (data) => {
