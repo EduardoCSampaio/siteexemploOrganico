@@ -16,8 +16,8 @@ export interface Product {
   gallery?: ImagePlaceholder[];
   sizes: string[];
   colors: string[];
-  rating: number;
-  reviewCount: number;
+  rating?: number;
+  reviewCount?: number;
 }
 
 export interface StyleGuide {
@@ -28,6 +28,8 @@ export interface StyleGuide {
 }
 
 export const products: Product[] = [
+  // This data is now fetched from Firestore, but we keep it here for reference
+  // and potential fallback. The AI-related flows still use this static data.
   {
     id: 'prod-1',
     name: 'Vestido de Noite Escarlate',
@@ -51,78 +53,6 @@ export const products: Product[] = [
     colors: ['Bege Suave', 'Branco Marfim'],
     rating: 4.9,
     reviewCount: 102,
-  },
-  {
-    id: 'prod-3',
-    name: 'Calça Clássica de Cintura Alta',
-    description: 'Feita sob medida para a perfeição, esta calça preta de cintura alta oferece uma silhueta elegante tanto para o escritório quanto para a noite.',
-    price: 189.99,
-    category: 'Calças',
-    image: imageMap['trousers-1'],
-    sizes: ['PP', 'P', 'M', 'G', 'GG'],
-    colors: ['Preto Clássico', 'Azul Marinho'],
-    rating: 4.7,
-    reviewCount: 98,
-  },
-  {
-    id: 'prod-4',
-    name: 'Jaqueta Motoqueira Moderna',
-    description: 'Feita de couro vegano macio, esta jaqueta motoqueira adiciona um toque de atitude a qualquer look. Uma peça atemporal com detalhes modernos.',
-    price: 249.99,
-    category: 'Jaquetas',
-    image: imageMap['jacket-1'],
-    sizes: ['P', 'M', 'G', 'GG'],
-    colors: ['Preto', 'Borgonha'],
-    rating: 4.8,
-    reviewCount: 85,
-  },
-  {
-    id: 'prod-5',
-    name: 'Saia Midi Floral',
-    description: 'Uma saia midi leve e fluida com uma delicada estampa floral. Ideal para brunches, festas no jardim ou um dia ensolarado.',
-    price: 129.99,
-    category: 'Saias',
-    image: imageMap['skirt-1'],
-    sizes: ['PP', 'P', 'M', 'G'],
-    colors: ['Floral Multicolorido'],
-    rating: 4.6,
-    reviewCount: 65,
-  },
-  {
-    id: 'prod-6',
-    name: 'Colar Statement Dourado',
-    description: 'Eleve seu look com este deslumbrante colar statement banhado a ouro. Um verdadeiro ponto de conversa.',
-    price: 89.99,
-    category: 'Acessórios',
-    image: imageMap['accessory-1'],
-    sizes: ['Tamanho Único'],
-    colors: ['Dourado'],
-    rating: 4.9,
-    reviewCount: 120,
-  },
-   {
-    id: 'prod-7',
-    name: 'Vestido de Linho para o Verão',
-    description: 'Fique fresca e estilosa com este vestido de linho respirável. Seu caimento relaxado é perfeito para dias quentes de verão e escapadas de férias.',
-    price: 159.99,
-    category: 'Vestidos',
-    image: imageMap['dress-2'],
-    sizes: ['PP', 'P', 'M', 'G'],
-    colors: ['Linho Natural', 'Branco', 'Azul Céu'],
-    rating: 4.7,
-    reviewCount: 88,
-  },
-  {
-    id: 'prod-8',
-    name: 'Jeans Slim-Fit',
-    description: 'Um par de jeans perfeito que combina conforto e estilo. O corte slim-fit valoriza todos os tipos de corpo.',
-    price: 179.99,
-    category: 'Calças',
-    image: imageMap['jeans-1'],
-    sizes: ['36', '38', '40', '42', '44', '46'],
-    colors: ['Lavagem Vintage', 'Índigo Escuro'],
-    rating: 4.8,
-    reviewCount: 150,
   },
 ];
 

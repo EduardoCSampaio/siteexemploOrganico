@@ -1,0 +1,253 @@
+'use client';
+import { useEffect } from 'react';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import {
+  doc,
+  setDoc,
+  getDoc,
+  addDoc,
+  collection,
+  serverTimestamp,
+} from 'firebase/firestore';
+import { useFirestore } from '@/firebase';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { useToast } from '@/hooks/use-toast';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+
+const productSchema = z.object({
+  name: z.string().min(1, 'Nome é obrigatório'),
+  description: z.string().min(1, 'Descrição é obrigatória'),
+  price: z.preprocess(
+    (val) => (val === '' ? NaN : Number(val)),
+    z.number({ invalid_type_error: 'Preço deve ser um número' }).min(0, 'Preço deve ser positivo')
+  ),
+  category: z.string().min(1, 'Categoria é obrigatória'),
+  'image.imageUrl': z.string().url('URL da imagem inválida'),
+  'image.imageHint': z.string().optional(),
+  sizes: z.string().transform((val) => val.split(',').map((s) => s.trim()).filter(Boolean)),
+  colors: z.string().transform((val) => val.split(',').map((s) => s.trim()).filter(Boolean)),
+});
+
+type ProductFormValues = z.infer<typeof productSchema>;
+
+export default function ProductFormPage({ params }: { params: { id: string } }) {
+  const { id } = params;
+  const isNew = id === 'new';
+  const firestore = useFirestore();
+  const router = useRouter();
+  const { toast } = useToast();
+
+  const form = useForm<ProductFormValues>({
+    resolver: zodResolver(productSchema),
+    defaultValues: {
+      name: '',
+      description: '',
+      price: 0,
+      category: '',
+      'image.imageUrl': '',
+      'image.imageHint': '',
+      sizes: [],
+      colors: [],
+    },
+  });
+
+  useEffect(() => {
+    if (!isNew && firestore) {
+      const fetchProduct = async () => {
+        const docRef = doc(firestore, 'clothing_items', id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          form.reset({
+            ...data,
+            sizes: Array.isArray(data.sizes) ? data.sizes.join(', ') : '',
+            colors: Array.isArray(data.colors) ? data.colors.join(', ') : '',
+          } as any);
+        } else {
+          toast({ variant: 'destructive', title: 'Produto não encontrado.' });
+          router.push('/admin/products');
+        }
+      };
+      fetchProduct();
+    }
+  }, [id, isNew, firestore, router, toast, form]);
+
+  const onSubmit: SubmitHandler<ProductFormValues> = async (data) => {
+    if (!firestore) return;
+    try {
+        const productData = {
+            name: data.name,
+            description: data.description,
+            price: data.price,
+            category: data.category,
+            image: {
+                imageUrl: data['image.imageUrl'],
+                imageHint: data['image.imageHint'],
+            },
+            sizes: data.sizes,
+            colors: data.colors,
+            updatedAt: serverTimestamp(),
+        };
+
+        if (isNew) {
+            const collectionRef = collection(firestore, 'clothing_items');
+            const docRef = await addDoc(collectionRef, {
+                ...productData,
+                createdAt: serverTimestamp(),
+            });
+            // Firestore now generates the ID, so we update the object with it
+            await setDoc(doc(firestore, 'clothing_items', docRef.id), { id: docRef.id }, { merge: true });
+
+            toast({ title: 'Produto criado com sucesso!' });
+        } else {
+            const docRef = doc(firestore, 'clothing_items', id);
+            await setDoc(docRef, productData, { merge: true });
+            toast({ title: 'Produto atualizado com sucesso!' });
+        }
+        router.push('/admin/products');
+    } catch (error) {
+        console.error("Error saving product:", error);
+        toast({ variant: 'destructive', title: 'Erro ao salvar produto' });
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{isNew ? 'Novo Produto' : 'Editar Produto'}</CardTitle>
+        <CardDescription>Preencha os detalhes do produto abaixo.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nome</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Nome do produto" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Descrição</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="Descrição detalhada" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Preço</FormLabel>
+                    <FormControl>
+                        <Input type="number" step="0.01" placeholder="99.99" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
+                <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Categoria</FormLabel>
+                    <FormControl>
+                        <Input placeholder="Ex: Vestidos" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
+            </div>
+            <FormField
+              control={form.control}
+              name="image.imageUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>URL da Imagem</FormLabel>
+                  <FormControl>
+                    <Input placeholder="https://..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="image.imageHint"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Dica de IA para Imagem (Opcional)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Ex: red dress" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="sizes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tamanhos (separados por vírgula)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="P, M, G, GG" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="colors"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Cores (separadas por vírgula)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Preto, Branco, Azul" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="flex justify-end gap-2">
+                <Button type="button" variant="outline" onClick={() => router.back()}>Cancelar</Button>
+                <Button type="submit" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting ? 'Salvando...' : 'Salvar Produto'}
+                </Button>
+            </div>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
+  );
+}
