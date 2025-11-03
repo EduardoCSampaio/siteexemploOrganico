@@ -1,0 +1,367 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the TrendSight Boutique application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user."
+        },
+        "firstName": {
+          "type": "string",
+          "description": "First name of the user."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "Last name of the user."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the user.",
+          "format": "email"
+        },
+        "profilePicture": {
+          "type": "string",
+          "description": "URL of the user's profile picture.",
+          "format": "uri"
+        },
+        "favoriteItemIds": {
+          "type": "array",
+          "description": "References to favorite items. (Relationship: User N:N ClothingItem)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "firstName",
+        "lastName",
+        "email"
+      ]
+    },
+    "ClothingItem": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ClothingItem",
+      "type": "object",
+      "description": "Represents a clothing item available in the TrendSight Boutique.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the clothing item."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the clothing item."
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description of the clothing item."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL of the clothing item's image.",
+          "format": "uri"
+        },
+        "price": {
+          "type": "number",
+          "description": "Price of the clothing item."
+        },
+        "availableSizes": {
+          "type": "array",
+          "description": "Available sizes for the clothing item.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "availableColors": {
+          "type": "array",
+          "description": "Available colors for the clothing item.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "styleGuideIds": {
+          "type": "array",
+          "description": "References to style guides the item belongs to. (Relationship: ClothingItem N:N StyleGuide)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "imageUrl",
+        "price",
+        "availableSizes",
+        "availableColors"
+      ]
+    },
+    "StyleGuide": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "StyleGuide",
+      "type": "object",
+      "description": "Represents a curated style guide or outfit inspiration.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the style guide."
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the style guide."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the style guide."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL of the style guide's image.",
+          "format": "uri"
+        },
+        "clothingItemIds": {
+          "type": "array",
+          "description": "References to clothing items included in the style guide. (Relationship: StyleGuide N:N ClothingItem)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "description",
+        "imageUrl"
+      ]
+    },
+    "Order": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Order",
+      "type": "object",
+      "description": "Represents a customer order.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the order."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the user who placed the order. (Relationship: User 1:N Order)"
+        },
+        "orderDate": {
+          "type": "string",
+          "description": "Date and time the order was placed.",
+          "format": "date-time"
+        },
+        "totalAmount": {
+          "type": "number",
+          "description": "Total amount of the order."
+        },
+        "shippingAddress": {
+          "type": "string",
+          "description": "Shipping address for the order."
+        },
+        "orderItemIds": {
+          "type": "array",
+          "description": "References to order items included in the order. (Relationship: Order 1:N OrderItem)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "orderDate",
+        "totalAmount",
+        "shippingAddress"
+      ]
+    },
+    "OrderItem": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "OrderItem",
+      "type": "object",
+      "description": "Represents an item within an order.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the order item."
+        },
+        "orderId": {
+          "type": "string",
+          "description": "Reference to the order this item belongs to. (Relationship: Order 1:N OrderItem)"
+        },
+        "clothingItemId": {
+          "type": "string",
+          "description": "Reference to the clothing item. (Relationship: ClothingItem 1:N OrderItem)"
+        },
+        "quantity": {
+          "type": "number",
+          "description": "Quantity of the clothing item in the order."
+        },
+        "price": {
+          "type": "number",
+          "description": "Price of the clothing item at the time of the order."
+        }
+      },
+      "required": [
+        "id",
+        "orderId",
+        "clothingItemId",
+        "quantity",
+        "price"
+      ]
+    },
+    "Admin": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Admin",
+      "type": "object",
+      "description": "Represents an administrator user with elevated privileges.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the admin user."
+        },
+        "username": {
+          "type": "string",
+          "description": "Username of the admin user."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the admin user.",
+          "format": "email"
+        }
+      },
+      "required": [
+        "id",
+        "username",
+        "email"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profiles. Path-based ownership: Only the user with the matching userId can read/write their profile.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/clothing_items/{clothingItemId}",
+        "definition": {
+          "entityName": "ClothingItem",
+          "schema": {
+            "$ref": "#/backend/entities/ClothingItem"
+          },
+          "description": "Stores clothing items. Admins can create, update, and delete items. Public read access for catalog browsing.",
+          "params": [
+            {
+              "name": "clothingItemId",
+              "description": "The unique identifier of the clothing item."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/style_guides/{styleGuideId}",
+        "definition": {
+          "entityName": "StyleGuide",
+          "schema": {
+            "$ref": "#/backend/entities/StyleGuide"
+          },
+          "description": "Stores style guides. Admins can create, update, and delete style guides. Public read access.",
+          "params": [
+            {
+              "name": "styleGuideId",
+              "description": "The unique identifier of the style guide."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/orders/{orderId}",
+        "definition": {
+          "entityName": "Order",
+          "schema": {
+            "$ref": "#/backend/entities/Order"
+          },
+          "description": "Stores orders for each user. Path-based ownership: Only the user with the matching userId can read/write their orders. Admins can also access all orders.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user who placed the order."
+            },
+            {
+              "name": "orderId",
+              "description": "The unique identifier of the order."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/orders/{orderId}/order_items/{orderItemId}",
+        "definition": {
+          "entityName": "OrderItem",
+          "schema": {
+            "$ref": "#/backend/entities/OrderItem"
+          },
+          "description": "Stores order items for each order. Path-based ownership: Only the user with the matching userId can read/write their order items. Admins can also access all order items.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user who placed the order."
+            },
+            {
+              "name": "orderId",
+              "description": "The unique identifier of the order."
+            },
+            {
+              "name": "orderItemId",
+              "description": "The unique identifier of the order item."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roles_admin/{userId}",
+        "definition": {
+          "entityName": "Admin",
+          "schema": {
+            "$ref": "#/backend/entities/Admin"
+          },
+          "description": "Collection used to assign admin roles. Existence of a document with a specific userId grants admin privileges.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the admin user."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to support TrendSight Boutique's core features, including clothing item catalog, style guides, user profile management, and admin functionalities. The design prioritizes authorization independence and QAPs (queries are not filters). \n\n1.  **Users Collection (`/users/{userId}`):** Each user has their own document containing profile information. This ensures path-based ownership for user-specific data like profile details and favorite items.\n2.  **ClothingItems Collection (`/clothing_items/{clothingItemId}`):**  Stores all clothing items. Open reads are possible for the product catalog. Create/Update/Delete operations should be restricted to admins (DBAC).\n3.  **StyleGuides Collection (`/style_guides/{styleGuideId}`):** Stores style guide data. Open reads are allowed. Create/Update/Delete operations should be restricted to admins (DBAC).\n4.  **Orders Collection (`/users/{userId}/orders/{orderId}`):** Orders are stored as subcollections under the user who created them, enabling easy retrieval of a user's order history and enforcing ownership.\n5.  **OrderItems Collection (`/users/{userId}/orders/{orderId}/order_items/{orderItemId}`):** Order items are stored as subcollections under their respective orders, ensuring that only the owner of the order or admins can access the order's items.\n6.  **Admin Roles Collection (`/roles_admin/{userId}`):** This collection uses *existence* to grant admin privileges to users. If a document exists with a user's ID, they are considered an admin.\n\n**Authorization Independence:**\nAuthorization independence is achieved through path-based ownership. For example, orders are stored under `/users/{userId}/orders/{orderId}`, making it easy to secure read/write access based solely on the `userId` obtained from `request.auth.uid` or from checking admin privileges. There are no `get()` calls to parent documents necessary.\n\n**QAPs (Rules Are Not Filters):**\nThe structure supports secure list operations:\n*   Listing clothing items and style guides are open to anyone, filtering must take place in the query.\n*   Listing of orders is restricted to the user who owns the order and admin users.\n\n**Admin Panel Considerations:**\nThe `/roles_admin/{userId}` collection directly supports the admin panel functionality. By checking for the existence of a document in this collection for the current user, security rules can easily grant elevated privileges for creating, updating, and deleting clothing items and style guides."
+  }
+}

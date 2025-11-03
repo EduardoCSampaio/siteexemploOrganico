@@ -1,0 +1,162 @@
+/**
+ * @file TrendSight Boutique Firestore Security Rules
+ * @version 2
+ *
+ * @Core Philosophy:
+ * This ruleset implements a hybrid security model, balancing public read access for catalog browsing with strict user-ownership and admin-controlled write access for sensitive data. User data is isolated under their respective user IDs. Administrative privileges are granted based on the existence of a document in the `/roles_admin/{userId}` collection.
+ *
+ * @Data Structure:
+ * - `/users/{userId}`: User profile information, accessible only to the user themselves.
+ * - `/clothing_items/{clothingItemId}`: Publicly readable catalog of clothing items, manageable only by admins.
+ * - `/style_guides/{styleGuideId}`: Publicly readable collection of style guides, manageable only by admins.
+ * - `/users/{userId}/orders/{orderId}`: Orders placed by a specific user, accessible only to the user and admins.
+ * - `/users/{userId}/orders/{orderId}/order_items/{orderItemId}`: Items within a specific order, accessible only to the user who placed the order and admins.
+ * - `/roles_admin/{userId}`: Collection to manage admin roles. The existence of a document indicates admin privileges.
+ *
+ * @Key Security Decisions:
+ * - **Public Read Access**: The `clothing_items` and `style_guides` collections are publicly readable to allow for catalog browsing without authentication.
+ * - **Admin-Only Writes**: Create, update, and delete operations on `clothing_items` and `style_guides` are restricted to users with admin privileges.
+ * - **User-Owned Data**: User profiles and their associated orders and order items are strictly controlled, granting access only to the user themselves (and admins).
+ * - **Admin Role Management**: Admin privileges are granted by the existence of a document in the `/roles_admin/{userId}` collection.
+ * - **No User Listing**: Listing of all users is implicitly denied to prevent information disclosure.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description: Protects user profiles. Only the user with the matching userId can read/write their profile.
+     * @path: /users/{userId}
+     * @allow: User (create) can create their own profile if the userId matches their auth.uid.
+     * @allow: User (get, update, delete) can access their profile if the userId matches their auth.uid.
+     * @deny: User cannot access another user's profile.
+     * @principle: Enforces document ownership for all operations on user profiles.
+     */
+    match /users/{userId} {
+      function isOwner(userId) {
+        return request.auth != null && request.auth.uid == userId;
+      }
+
+      function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+      }
+
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description: Controls access to clothing items. Admins can create, update, and delete items. Public read access for catalog browsing.
+     * @path: /clothing_items/{clothingItemId}
+     * @allow: Any user (get, list) can read clothing items.
+     * @allow: Admin (create, update, delete) can manage clothing items.
+     * @deny: Non-admin users cannot create, update, or delete clothing items.
+     * @principle: Provides public read access while restricting write access to authorized administrators.
+     */
+    match /clothing_items/{clothingItemId} {
+      function isAdmin() {
+        return request.auth != null && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+      }
+
+      allow get, list: if true;
+      allow create: if isAdmin();
+      allow update: if isAdmin() && resource != null;
+      allow delete: if isAdmin() && resource != null;
+    }
+
+    /**
+     * @description: Controls access to style guides. Admins can create, update, and delete style guides. Public read access.
+     * @path: /style_guides/{styleGuideId}
+     * @allow: Any user (get, list) can read style guides.
+     * @allow: Admin (create, update, delete) can manage style guides.
+     * @deny: Non-admin users cannot create, update, or delete style guides.
+     * @principle: Provides public read access while restricting write access to authorized administrators.
+     */
+    match /style_guides/{styleGuideId} {
+      function isAdmin() {
+        return request.auth != null && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+      }
+
+      allow get, list: if true;
+      allow create: if isAdmin();
+      allow update: if isAdmin() && resource != null;
+      allow delete: if isAdmin() && resource != null;
+    }
+
+    /**
+     * @description: Protects orders. Only the user with the matching userId can read/write their orders. Admins can also access all orders.
+     * @path: /users/{userId}/orders/{orderId}
+     * @allow: User (get, list, create, update, delete) can manage their own orders if the userId matches their auth.uid.
+     * @allow: Admin (get, list, create, update, delete) can manage all orders.
+     * @deny: User cannot access another user's orders.
+     * @principle: Enforces document ownership and allows admin override for managing orders.
+     */
+    match /users/{userId}/orders/{orderId} {
+      function isOwner(userId) {
+        return request.auth != null && request.auth.uid == userId;
+      }
+
+      function isAdmin() {
+        return request.auth != null && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+      }
+
+      function isExistingOwner(userId) {
+          return isOwner(userId) && resource != null;
+      }
+
+      allow get, list: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId) || isAdmin();
+      allow delete: if isExistingOwner(userId) || isAdmin();
+    }
+
+    /**
+     * @description: Protects order items. Only the user with the matching userId can read/write their order items. Admins can also access all order items.
+     * @path: /users/{userId}/orders/{orderId}/order_items/{orderItemId}
+     * @allow: User (get, list, create, update, delete) can manage their own order items if the userId matches their auth.uid.
+     * @allow: Admin (get, list, create, update, delete) can manage all order items.
+     * @deny: User cannot access another user's order items.
+     * @principle: Enforces document ownership and allows admin override for managing order items.
+     */
+    match /users/{userId}/orders/{orderId}/order_items/{orderItemId} {
+      function isOwner(userId) {
+        return request.auth != null && request.auth.uid == userId;
+      }
+
+      function isAdmin() {
+        return request.auth != null && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+      }
+
+      function isExistingOwner(userId) {
+          return isOwner(userId) && resource != null;
+      }
+
+      allow get, list: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId) || isAdmin();
+      allow delete: if isExistingOwner(userId) || isAdmin();
+    }
+
+    /**
+     * @description: Grants admin privileges based on the existence of a document with the user's ID in this collection.
+     * @path: /roles_admin/{userId}
+     * @allow: Admin (create) can create their own role document.
+     * @deny: Non-admin users cannot create, update, or delete role documents.
+     * @principle: Uses document existence as a means of granting elevated permissions.
+     */
+    match /roles_admin/{userId} {
+      function isAdmin() {
+        return request.auth != null && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+      }
+
+      allow get: if isAdmin();
+      allow list: if false;
+      allow create: if request.auth.uid == userId && isAdmin();
+      allow update: if false;
+      allow delete: if isAdmin() && resource != null;
+    }
+  }
+}
