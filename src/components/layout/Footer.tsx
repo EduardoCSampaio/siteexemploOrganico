@@ -12,7 +12,7 @@ export function Footer() {
           <div className="space-y-4">
             <Logo className="text-2xl" />
             <p className="text-sm text-muted-foreground">
-              Your personal AI-powered fashion destination.
+              Sua loja de moda consciente e com estilo.
             </p>
             <div className="flex space-x-4">
               <Link href="#" aria-label="Twitter">
@@ -59,7 +59,7 @@ export function Footer() {
           </div>
         </div>
         <div className="mt-8 border-t pt-8 text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} TrendSight Boutique. Todos os direitos reservados.
+          © {new Date().getFullYear()} Organico. Todos os direitos reservados.
         </div>
       </div>
     </footer>

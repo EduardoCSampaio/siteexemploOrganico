@@ -45,12 +45,12 @@ const prompt = ai.definePrompt({
   name: 'generateOutfitInspirationPrompt',
   input: {schema: GenerateOutfitInspirationInputSchema},
   output: {schema: GenerateOutfitInspirationOutputSchema},
-  prompt: `You are a personal stylist for TrendSight Boutique. A user is looking for an outfit for a specific occasion.
+  prompt: `You are a personal stylist for Organico. A user is looking for an outfit for a specific occasion.
 
   Occasion: {{{occasion}}}
   User Preferences: {{{userPreferences}}}
 
-  Recommend an outfit that is appropriate for the occasion and incorporates the user's preferences, if provided. The outfit should include specific items from TrendSight Boutique.
+  Recommend an outfit that is appropriate for the occasion and incorporates the user's preferences, if provided. The outfit should include specific items from Organico.
   Describe the outfit and list the individual clothing items with their names, descriptions, image URLs, prices, available sizes and colors.
   Format your response as a JSON object that conforms to the schema for GenerateOutfitInspirationOutputSchema.
 

@@ -40,10 +40,10 @@ export default function GameHomePage() {
       {!gameStarted ? (
         <div className="text-center animate-fade-in">
           <Logo className="text-8xl md:text-9xl text-primary drop-shadow-lg" />
-          <p className="mt-4 text-xl text-muted-foreground">Aperte play para começar</p>
+          <p className="mt-4 text-xl text-muted-foreground animate-fade-in animation-delay-300">Aperte play para começar</p>
           <Button
             size="lg"
-            className="mt-8 text-2xl px-12 py-8"
+            className="mt-8 text-2xl px-12 py-8 animate-fade-in-up animation-delay-500"
             onClick={() => setGameStarted(true)}
           >
             <Gamepad2 className="mr-4 h-8 w-8" />

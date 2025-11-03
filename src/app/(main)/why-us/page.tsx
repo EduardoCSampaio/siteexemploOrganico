@@ -29,7 +29,7 @@ export default function WhyUsPage() {
     <div className="container py-12">
       <div className="text-center mb-12">
         <h1 className="font-headline text-4xl md:text-5xl font-bold">
-          Por Que Escolher a TrendSight?
+          Por Que Escolher a Organico?
         </h1>
         <p className="mt-3 max-w-2xl mx-auto text-lg text-muted-foreground">
           Descubra os diferenciais que tornam nossa boutique o seu destino de moda preferido.

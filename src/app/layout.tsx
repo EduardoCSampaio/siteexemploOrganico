@@ -4,8 +4,8 @@ import './globals.css';
 import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = {
-  title: 'TrendSight Boutique',
-  description: 'Your personal AI-powered fashion destination.',
+  title: 'Organico',
+  description: 'Sua loja de moda consciente e com estilo.',
 };
 
 export default function RootLayout({

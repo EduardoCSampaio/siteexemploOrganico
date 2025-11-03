@@ -7,16 +7,16 @@ export default function AboutPage() {
         </h1>
         <div className="space-y-6 text-lg text-muted-foreground text-justify">
           <p>
-            Bem-vindo à TrendSight Boutique, onde a moda encontra a inovação. Nascemos da paixão por estilo e da crença de que todos merecem se sentir confiantes e expressar sua individualidade através das roupas.
+            Bem-vindo à Organico, onde a moda encontra a sustentabilidade. Nascemos da paixão por estilo e da crença de que é possível se vestir bem e cuidar do planeta.
           </p>
           <p>
-            Nossa missão é oferecer uma curadoria de peças que combinam tendências atuais com um toque de atemporalidade. Cada item em nossa coleção é escolhido a dedo, pensando em qualidade, conforto e, claro, muito estilo.
+            Nossa missão é oferecer uma curadoria de peças feitas com materiais orgânicos e processos que respeitam o meio ambiente. Cada item em nossa coleção é escolhido a dedo, pensando em qualidade, conforto, durabilidade e, claro, muito estilo.
           </p>
           <p>
-            Mais do que uma loja, somos seus parceiros de estilo. Com nosso exclusivo Assistente de Estilo com IA, levamos a experiência de compra a um novo nível, oferecendo recomendações personalizadas que realmente entendem você.
+            Acreditamos em um consumo mais consciente e transparente. Por isso, trabalhamos com parceiros que compartilham dos nossos valores e buscamos sempre inovar em nossas práticas.
           </p>
           <p>
-            Junte-se a nós nesta jornada fashion e descubra a melhor versão do seu estilo.
+            Junte-se a nós nesta jornada por uma moda mais verde e descubra a beleza de se vestir com propósito.
           </p>
         </div>
       </div>
