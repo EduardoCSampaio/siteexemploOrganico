@@ -35,8 +35,8 @@ const productSchema = z.object({
     z.number({ invalid_type_error: 'Preço deve ser um número' }).min(0, 'Preço deve ser positivo')
   ),
   category: z.string().min(1, 'Categoria é obrigatória'),
-  'image.imageUrl': z.string().url('URL da imagem inválida'),
-  'image.imageHint': z.string().optional(),
+  imageUrl: z.string().url('URL da imagem inválida'),
+  imageHint: z.string().optional(),
   sizes: z.string().transform((val) => val.split(',').map((s) => s.trim()).filter(Boolean)),
   colors: z.string().transform((val) => val.split(',').map((s) => s.trim()).filter(Boolean)),
 });
@@ -58,8 +58,8 @@ export default function ProductFormPage() {
       description: '',
       price: 0,
       category: '',
-      'image.imageUrl': '',
-      'image.imageHint': '',
+      imageUrl: '',
+      imageHint: '',
       sizes: [],
       colors: [],
     },
@@ -73,7 +73,12 @@ export default function ProductFormPage() {
         if (docSnap.exists()) {
           const data = docSnap.data();
           form.reset({
-            ...data,
+            name: data.name,
+            description: data.description,
+            price: data.price,
+            category: data.category,
+            imageUrl: data.image?.imageUrl || '',
+            imageHint: data.image?.imageHint || '',
             sizes: Array.isArray(data.sizes) ? data.sizes.join(', ') : '',
             colors: Array.isArray(data.colors) ? data.colors.join(', ') : '',
           } as any);
@@ -95,8 +100,8 @@ export default function ProductFormPage() {
             price: data.price,
             category: data.category,
             image: {
-                imageUrl: data['image.imageUrl'],
-                imageHint: data['image.imageHint'],
+                imageUrl: data.imageUrl,
+                imageHint: data.imageHint,
             },
             sizes: data.sizes,
             colors: data.colors,
@@ -190,7 +195,7 @@ export default function ProductFormPage() {
             </div>
             <FormField
               control={form.control}
-              name="image.imageUrl"
+              name="imageUrl"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>URL da Imagem</FormLabel>
@@ -203,7 +208,7 @@ export default function ProductFormPage() {
             />
              <FormField
               control={form.control}
-              name="image.imageHint"
+              name="imageHint"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Dica de IA para Imagem (Opcional)</FormLabel>
