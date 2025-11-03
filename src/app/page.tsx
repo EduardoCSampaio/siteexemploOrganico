@@ -32,7 +32,7 @@ export default function GameHomePage() {
 
   return (
     <div
-      className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4 font-mono focus:outline-none"
+      className="flex flex-col items-center justify-center min-h-screen bg-neutral-900 text-neutral-100 p-4 font-mono focus:outline-none"
       onKeyDown={handleKeyDown}
       tabIndex={0}
       autoFocus
@@ -40,10 +40,10 @@ export default function GameHomePage() {
       {!gameStarted ? (
         <div className="text-center animate-fade-in">
           <Logo className="text-8xl md:text-9xl text-primary drop-shadow-lg" />
-          <p className="mt-4 text-xl text-muted-foreground animate-fade-in animation-delay-300">Aperte play para começar</p>
+          <p className="mt-4 text-xl text-neutral-400 animate-fade-in animation-delay-300">Aperte play para começar</p>
           <Button
             size="lg"
-            className="mt-8 text-2xl px-12 py-8 animate-fade-in-up animation-delay-500"
+            className="mt-8 text-2xl px-12 py-8 animate-fade-in-up animation-delay-500 bg-primary/80 hover:bg-primary text-primary-foreground"
             onClick={() => setGameStarted(true)}
           >
             <Gamepad2 className="mr-4 h-8 w-8" />
@@ -52,7 +52,7 @@ export default function GameHomePage() {
         </div>
       ) : (
         <div className="w-full max-w-md animate-fade-in">
-          <div className="border-4 border-primary p-8 rounded-lg bg-card/80 shadow-2xl">
+          <div className="border-4 border-primary/50 p-8 rounded-lg bg-black/50 shadow-2xl shadow-primary/20">
             <h2 className="text-3xl font-bold text-center text-primary mb-8 font-headline">
               Menu Principal
             </h2>
@@ -64,15 +64,15 @@ export default function GameHomePage() {
                     asChild
                     variant="ghost"
                     className={cn(
-                      "w-full justify-start text-xl py-6 transition-all duration-200",
-                      selectedOption === index ? 'bg-accent text-accent-foreground' : ''
+                      "w-full justify-start text-xl py-6 transition-all duration-200 hover:bg-primary/20",
+                      selectedOption === index ? 'bg-primary/20 text-white' : 'text-neutral-300'
                     )}
                     onMouseEnter={() => setSelectedOption(index)}
                   >
                     <Link href={option.href} className="flex items-center">
                       <ArrowRight
                         className={cn(
-                          'mr-4 h-5 w-5 transition-opacity',
+                          'mr-4 h-5 w-5 text-primary transition-opacity duration-300',
                           selectedOption === index ? 'opacity-100' : 'opacity-0'
                         )}
                       />

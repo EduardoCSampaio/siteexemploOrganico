@@ -106,7 +106,24 @@ export default {
         'fade-in': 'fade-in 0.5s ease-out forwards',
         'fade-in-up': 'fade-in-up 0.5s ease-out forwards',
       },
+      animationDelay: {
+        '300': '300ms',
+        '500': '500ms',
+      }
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [
+    require('tailwindcss-animate'),
+    function ({ addUtilities, theme }: {addUtilities: any, theme: any}) {
+      const newUtilities = {
+        '.animation-delay-300': {
+          'animation-delay': theme('animationDelay.300'),
+        },
+        '.animation-delay-500': {
+          'animation-delay': theme('animationDelay.500'),
+        },
+      };
+      addUtilities(newUtilities);
+    },
+  ],
 } satisfies Config;
