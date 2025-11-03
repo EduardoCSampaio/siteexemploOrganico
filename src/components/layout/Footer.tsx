@@ -28,38 +28,38 @@ export function Footer() {
           </div>
 
           <div className="space-y-4">
-            <h4 className="font-headline text-lg font-semibold">Shop</h4>
+            <h4 className="font-headline text-lg font-semibold">Loja</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/products?category=Dresses" className="text-muted-foreground hover:text-primary transition-colors">Dresses</Link></li>
-              <li><Link href="/products?category=Tops" className="text-muted-foreground hover:text-primary transition-colors">Tops</Link></li>
-              <li><Link href="/products?category=Trousers" className="text-muted-foreground hover:text-primary transition-colors">Trousers & Jeans</Link></li>
-              <li><Link href="/products?category=Jackets" className="text-muted-foreground hover:text-primary transition-colors">Jackets</Link></li>
+              <li><Link href="/products?category=Dresses" className="text-muted-foreground hover:text-primary transition-colors">Vestidos</Link></li>
+              <li><Link href="/products?category=Tops" className="text-muted-foreground hover:text-primary transition-colors">Blusas</Link></li>
+              <li><Link href="/products?category=Trousers" className="text-muted-foreground hover:text-primary transition-colors">Calças & Jeans</Link></li>
+              <li><Link href="/products?category=Jackets" className="text-muted-foreground hover:text-primary transition-colors">Jaquetas</Link></li>
             </ul>
           </div>
 
           <div className="space-y-4">
-            <h4 className="font-headline text-lg font-semibold">About</h4>
+            <h4 className="font-headline text-lg font-semibold">Sobre</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="#" className="text-muted-foreground hover:text-primary transition-colors">Our Story</Link></li>
-              <li><Link href="/style-guides" className="text-muted-foreground hover:text-primary transition-colors">Style Guides</Link></li>
-              <li><Link href="/style-advisor" className="text-muted-foreground hover:text-primary transition-colors">AI Stylist</Link></li>
-              <li><Link href="#" className="text-muted-foreground hover:text-primary transition-colors">Contact</Link></li>
+              <li><Link href="/about" className="text-muted-foreground hover:text-primary transition-colors">Nossa História</Link></li>
+              <li><Link href="/how-to-buy" className="text-muted-foreground hover:text-primary transition-colors">Como Comprar</Link></li>
+              <li><Link href="/why-us" className="text-muted-foreground hover:text-primary transition-colors">Por que nós?</Link></li>
+              <li><Link href="/style-advisor" className="text-muted-foreground hover:text-primary transition-colors">Consultor de Estilo IA</Link></li>
             </ul>
           </div>
 
           <div className="space-y-4">
             <h4 className="font-headline text-lg font-semibold">Newsletter</h4>
             <p className="text-sm text-muted-foreground">
-              Subscribe for exclusive offers and style news.
+              Inscreva-se para ofertas exclusivas e notícias de estilo.
             </p>
             <div className="flex w-full max-w-sm items-center space-x-2">
               <Input type="email" placeholder="Email" className="bg-transparent"/>
-              <Button type="submit">Subscribe</Button>
+              <Button type="submit">Inscrever</Button>
             </div>
           </div>
         </div>
         <div className="mt-8 border-t pt-8 text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} TrendSight Boutique. All Rights Reserved.
+          © {new Date().getFullYear()} TrendSight Boutique. Todos os direitos reservados.
         </div>
       </div>
     </footer>

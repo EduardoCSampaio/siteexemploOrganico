@@ -15,9 +15,12 @@ import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 
 const navLinks = [
-  { href: "/products", label: "Shop" },
-  { href: "/style-guides", label: "Style Guides" },
-  { href: "/style-advisor", label: "Style Advisor" },
+  { href: "/products", label: "Roupas" },
+  { href: "/about", label: "Sobre nós" },
+  { href: "/how-to-buy", label: "Como comprar" },
+  { href: "/why-us", label: "Por que nos escolher?" },
+  { href: "/style-guides", label: "Guias de Estilo" },
+  { href: "/style-advisor", label: "Consultor de Estilo" },
 ];
 
 export function Header() {
@@ -30,18 +33,24 @@ export function Header() {
             <Logo className="text-2xl"/>
           </Link>
           <nav className="flex items-center space-x-6 text-sm font-medium">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  "transition-colors hover:text-primary",
-                  pathname === link.href ? "text-primary" : "text-foreground/60"
-                )}
-              >
-                {link.label}
-              </Link>
-            ))}
+            <Link
+              href="/products"
+              className={cn(
+                "transition-colors hover:text-primary",
+                pathname?.startsWith("/products") ? "text-primary" : "text-foreground/60"
+              )}
+            >
+              Roupas
+            </Link>
+            <Link
+              href="/style-advisor"
+              className={cn(
+                "transition-colors hover:text-primary",
+                pathname === "/style-advisor" ? "text-primary" : "text-foreground/60"
+              )}
+            >
+              Consultor de Estilo
+            </Link>
           </nav>
         </div>
 
