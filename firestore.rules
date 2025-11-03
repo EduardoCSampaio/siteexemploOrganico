@@ -24,6 +24,15 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Helper functions
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return request.auth != null && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+    }
+
     /**
      * @description: Protects user profiles. Only the user with the matching userId can read/write their profile.
      * @path: /users/{userId}
@@ -33,19 +42,11 @@ service cloud.firestore {
      * @principle: Enforces document ownership for all operations on user profiles.
      */
     match /users/{userId} {
-      function isOwner(userId) {
-        return request.auth != null && request.auth.uid == userId;
-      }
-
-      function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
-      }
-
       allow get: if isOwner(userId);
       allow list: if false;
       allow create: if isOwner(userId) && request.resource.data.id == userId;
-      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
-      allow delete: if isExistingOwner(userId);
+      allow update: if isOwner(userId) && resource != null && request.resource.data.id == resource.data.id;
+      allow delete: if isOwner(userId) && resource != null;
     }
 
     /**
@@ -57,14 +58,8 @@ service cloud.firestore {
      * @principle: Provides public read access while restricting write access to authorized administrators.
      */
     match /clothing_items/{clothingItemId} {
-      function isAdmin() {
-        return request.auth != null && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
-      }
-
       allow get, list: if true;
-      allow create: if request.auth != null && isAdmin();
-      allow update: if isAdmin() && resource != null;
-      allow delete: if isAdmin() && resource != null;
+      allow create, update, delete: if isAdmin();
     }
 
     /**
@@ -76,14 +71,8 @@ service cloud.firestore {
      * @principle: Provides public read access while restricting write access to authorized administrators.
      */
     match /style_guides/{styleGuideId} {
-      function isAdmin() {
-        return request.auth != null && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
-      }
-
       allow get, list: if true;
-      allow create: if isAdmin();
-      allow update: if isAdmin() && resource != null;
-      allow delete: if isAdmin() && resource != null;
+      allow create, update, delete: if isAdmin();
     }
 
     /**
@@ -95,22 +84,9 @@ service cloud.firestore {
      * @principle: Enforces document ownership and allows admin override for managing orders.
      */
     match /users/{userId}/orders/{orderId} {
-      function isOwner(userId) {
-        return request.auth != null && request.auth.uid == userId;
-      }
-
-      function isAdmin() {
-        return request.auth != null && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
-      }
-
-      function isExistingOwner(userId) {
-          return isOwner(userId) && resource != null;
-      }
-
       allow get, list: if isOwner(userId) || isAdmin();
       allow create: if isOwner(userId);
-      allow update: if isExistingOwner(userId) || isAdmin();
-      allow delete: if isExistingOwner(userId) || isAdmin();
+      allow update, delete: if (isOwner(userId) && resource != null) || isAdmin();
     }
 
     /**
@@ -122,22 +98,9 @@ service cloud.firestore {
      * @principle: Enforces document ownership and allows admin override for managing order items.
      */
     match /users/{userId}/orders/{orderId}/order_items/{orderItemId} {
-      function isOwner(userId) {
-        return request.auth != null && request.auth.uid == userId;
-      }
-
-      function isAdmin() {
-        return request.auth != null && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
-      }
-
-      function isExistingOwner(userId) {
-          return isOwner(userId) && resource != null;
-      }
-
       allow get, list: if isOwner(userId) || isAdmin();
       allow create: if isOwner(userId);
-      allow update: if isExistingOwner(userId) || isAdmin();
-      allow delete: if isExistingOwner(userId) || isAdmin();
+      allow update, delete: if (isOwner(userId) && resource != null) || isAdmin();
     }
 
     /**
@@ -148,10 +111,6 @@ service cloud.firestore {
      * @principle: Uses document existence as a means of granting elevated permissions.
      */
     match /roles_admin/{userId} {
-      function isAdmin() {
-        return request.auth != null && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
-      }
-
       allow get: if isAdmin();
       allow list: if false;
       allow create: if request.auth.uid == userId && isAdmin();
