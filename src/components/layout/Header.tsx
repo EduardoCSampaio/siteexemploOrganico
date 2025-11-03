@@ -18,7 +18,7 @@ const navLinks = [
   { href: "/products", label: "Roupas" },
   { href: "/about", label: "Sobre nós" },
   { href: "/how-to-buy", label: "Como comprar" },
-  { href: "/why-us", label: "Por que nos escolher?" },
+  { href: "/why-us", label: "Por que nós?" },
   { href: "/style-advisor", label: "Consultor de Estilo" },
 ];
 

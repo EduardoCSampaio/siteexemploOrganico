@@ -11,7 +11,7 @@ const menuOptions = [
   { label: 'Roupas', href: '/products' },
   { label: 'Sobre nós', href: '/about' },
   { label: 'Como comprar', href: '/how-to-buy' },
-  { label: 'Por que nos escolher?', href: '/why-us' },
+  { label: 'Por que nós?', href: '/why-us' },
 ];
 
 export default function GameHomePage() {
