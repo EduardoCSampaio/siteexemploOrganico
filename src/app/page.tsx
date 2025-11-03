@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowRight, Gamepad2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { Logo } from '@/components/icons';
 
 const menuOptions = [
   { label: 'Roupas', href: '/products' },
@@ -19,8 +20,10 @@ export default function GameHomePage() {
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowDown') {
+      e.preventDefault();
       setSelectedOption(prev => (prev + 1) % menuOptions.length);
     } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
       setSelectedOption(prev => (prev - 1 + menuOptions.length) % menuOptions.length);
     } else if (e.key === 'Enter') {
       document.getElementById(`menu-option-${selectedOption}`)?.click();
@@ -29,21 +32,19 @@ export default function GameHomePage() {
 
   return (
     <div
-      className="flex flex-col items-center justify-center min-h-[calc(100vh-8rem)] bg-background text-foreground p-4 font-mono"
+      className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4 font-mono focus:outline-none"
       onKeyDown={handleKeyDown}
       tabIndex={0}
+      autoFocus
     >
       {!gameStarted ? (
         <div className="text-center animate-fade-in">
-          <h1 className="text-6xl md:text-8xl font-bold font-headline text-primary drop-shadow-lg">
-            TrendSight
-          </h1>
+          <Logo className="text-8xl md:text-9xl text-primary drop-shadow-lg" />
           <p className="mt-4 text-xl text-muted-foreground">Aperte play para começar</p>
           <Button
             size="lg"
             className="mt-8 text-2xl px-12 py-8"
             onClick={() => setGameStarted(true)}
-            autoFocus
           >
             <Gamepad2 className="mr-4 h-8 w-8" />
             Play
