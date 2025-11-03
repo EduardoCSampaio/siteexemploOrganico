@@ -106,9 +106,9 @@ service cloud.firestore {
     /**
      * @description: Grants admin privileges. Allows creation of the first admin, then restricts creation to other admins.
      * @path: /roles_admin/{userId}
-     * @allow: User can create their admin role if no other admins exist.
+     * @allow: User can create their admin role if their uid matches the document id.
      * @allow: Admin can create/delete other admin roles.
-     * @principle: Uses document existence for permissions, with a bootstrap rule for the first user.
+     * @principle: Uses document existence for permissions.
      */
     match /roles_admin/{userId} {
       allow get: if isAdmin();
