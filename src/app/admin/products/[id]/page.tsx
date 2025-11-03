@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { FirestorePermissionError, errorEmitter } from '@/firebase';
 
 const productSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
@@ -93,40 +94,68 @@ export default function ProductFormPage() {
 
   const onSubmit: SubmitHandler<ProductFormValues> = async (data) => {
     if (!firestore) return;
-    try {
-        const productData = {
-            name: data.name,
-            description: data.description,
-            price: data.price,
-            category: data.category,
-            image: {
-                imageUrl: data.imageUrl,
-                imageHint: data.imageHint,
-            },
-            sizes: data.sizes,
-            colors: data.colors,
-            updatedAt: serverTimestamp(),
+    
+    const productData = {
+        name: data.name,
+        description: data.description,
+        price: data.price,
+        category: data.category,
+        image: {
+            imageUrl: data.imageUrl,
+            imageHint: data.imageHint,
+        },
+        sizes: data.sizes,
+        colors: data.colors,
+        updatedAt: serverTimestamp(),
+    };
+
+    if (isNew) {
+        const collectionRef = collection(firestore, 'clothing_items');
+        const finalProductData = {
+            ...productData,
+            createdAt: serverTimestamp(),
         };
-
-        if (isNew) {
-            const collectionRef = collection(firestore, 'clothing_items');
-            const docRef = await addDoc(collectionRef, {
-                ...productData,
-                createdAt: serverTimestamp(),
+        addDoc(collectionRef, finalProductData)
+            .then(docRef => {
+                // Set the ID in the document after creation
+                setDoc(doc(firestore, 'clothing_items', docRef.id), { id: docRef.id }, { merge: true })
+                    .catch(error => {
+                        const permissionError = new FirestorePermissionError({
+                            path: docRef.path,
+                            operation: 'update', // or 'create' if this is the intended main operation
+                            requestResourceData: { id: docRef.id },
+                        });
+                        errorEmitter.emit('permission-error', permissionError);
+                        toast({ variant: 'destructive', title: 'Erro de permissão ao definir ID do produto.' });
+                    })
+                toast({ title: 'Produto criado com sucesso!' });
+                router.push('/admin/products');
+            })
+            .catch(error => {
+                const permissionError = new FirestorePermissionError({
+                    path: collectionRef.path,
+                    operation: 'create',
+                    requestResourceData: finalProductData,
+                });
+                errorEmitter.emit('permission-error', permissionError);
+                toast({ variant: 'destructive', title: 'Erro ao criar produto' });
             });
-            // Firestore now generates the ID, so we update the object with it
-            await setDoc(doc(firestore, 'clothing_items', docRef.id), { id: docRef.id }, { merge: true });
-
-            toast({ title: 'Produto criado com sucesso!' });
-        } else {
-            const docRef = doc(firestore, 'clothing_items', id);
-            await setDoc(docRef, productData, { merge: true });
-            toast({ title: 'Produto atualizado com sucesso!' });
-        }
-        router.push('/admin/products');
-    } catch (error) {
-        console.error("Error saving product:", error);
-        toast({ variant: 'destructive', title: 'Erro ao salvar produto' });
+    } else {
+        const docRef = doc(firestore, 'clothing_items', id);
+        setDoc(docRef, productData, { merge: true })
+            .then(() => {
+                toast({ title: 'Produto atualizado com sucesso!' });
+                router.push('/admin/products');
+            })
+            .catch(error => {
+                const permissionError = new FirestorePermissionError({
+                    path: docRef.path,
+                    operation: 'update',
+                    requestResourceData: productData,
+                });
+                errorEmitter.emit('permission-error', permissionError);
+                toast({ variant: 'destructive', title: 'Erro ao atualizar produto' });
+            });
     }
   };
 
