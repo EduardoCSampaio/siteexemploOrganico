@@ -32,18 +32,19 @@ export default function GameHomePage() {
 
   return (
     <div
-      className="flex flex-col items-center justify-center min-h-screen bg-neutral-900 text-neutral-100 p-4 font-mono focus:outline-none"
+      className="flex flex-col items-center justify-center min-h-screen bg-neutral-900 text-neutral-100 p-4 font-game focus:outline-none relative overflow-hidden"
       onKeyDown={handleKeyDown}
       tabIndex={0}
       autoFocus
     >
+      <div className="absolute inset-0 scanlines" />
       {!gameStarted ? (
-        <div className="text-center animate-fade-in">
-          <Logo className="text-8xl md:text-9xl text-primary drop-shadow-lg" />
-          <p className="mt-4 text-xl text-neutral-400 animate-fade-in animation-delay-300">Aperte play para começar</p>
+        <div className="text-center animate-fade-in z-10">
+          <Logo className="text-6xl md:text-7xl text-primary drop-shadow-lg !font-game" />
+          <p className="mt-6 text-lg text-neutral-400 animate-blink">Aperte play para começar</p>
           <Button
             size="lg"
-            className="mt-8 text-2xl px-12 py-8 animate-fade-in-up animation-delay-500 bg-primary/80 hover:bg-primary text-primary-foreground"
+            className="mt-8 text-2xl px-12 py-8 animate-fade-in-up animation-delay-500 bg-primary/80 hover:bg-primary text-primary-foreground font-game tracking-widest"
             onClick={() => setGameStarted(true)}
           >
             <Gamepad2 className="mr-4 h-8 w-8" />
@@ -51,12 +52,12 @@ export default function GameHomePage() {
           </Button>
         </div>
       ) : (
-        <div className="w-full max-w-md animate-fade-in">
-          <div className="border-4 border-primary/50 p-8 rounded-lg bg-black/50 shadow-2xl shadow-primary/20">
-            <h2 className="text-3xl font-bold text-center text-primary mb-8 font-headline">
-              Menu Principal
+        <div className="w-full max-w-md animate-fade-in z-10">
+          <div className="border-4 border-primary/50 p-6 sm:p-8 rounded-lg bg-black/50 shadow-2xl shadow-primary/20">
+            <h2 className="text-2xl sm:text-3xl font-bold text-center text-primary mb-8 font-game tracking-wider">
+              MENU
             </h2>
-            <ul className="space-y-4">
+            <ul className="space-y-3">
               {menuOptions.map((option, index) => (
                 <li key={option.href}>
                   <Button
@@ -64,7 +65,7 @@ export default function GameHomePage() {
                     asChild
                     variant="ghost"
                     className={cn(
-                      "w-full justify-start text-xl py-6 transition-all duration-200 hover:bg-primary/20",
+                      "w-full justify-start text-lg sm:text-xl py-4 sm:py-5 transition-all duration-200 hover:bg-primary/20",
                       selectedOption === index ? 'bg-primary/20 text-white' : 'text-neutral-300'
                     )}
                     onMouseEnter={() => setSelectedOption(index)}
@@ -72,8 +73,8 @@ export default function GameHomePage() {
                     <Link href={option.href} className="flex items-center">
                       <ArrowRight
                         className={cn(
-                          'mr-4 h-5 w-5 text-primary transition-opacity duration-300',
-                          selectedOption === index ? 'opacity-100' : 'opacity-0'
+                          'mr-4 h-5 w-5 text-primary transition-all duration-300',
+                          selectedOption === index ? 'opacity-100 scale-110' : 'opacity-0 scale-90'
                         )}
                       />
                       {option.label}
