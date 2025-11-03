@@ -11,7 +11,7 @@ import {
   collection,
   serverTimestamp,
 } from 'firebase/firestore';
-import { useFirestore } from '@/firebase';
+import { useFirestore, useUser } from '@/firebase';
 import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,6 +27,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { FirestorePermissionError, errorEmitter } from '@/firebase';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const productSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
@@ -44,6 +45,53 @@ const productSchema = z.object({
 
 type ProductFormValues = z.infer<typeof productSchema>;
 
+
+function ProductFormSkeleton() {
+    return (
+        <Card>
+            <CardHeader>
+                <Skeleton className="h-7 w-48" />
+                <Skeleton className="h-4 w-72" />
+            </CardHeader>
+            <CardContent>
+                <div className="space-y-6">
+                    <div className="space-y-2">
+                        <Skeleton className="h-4 w-16" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                    <div className="space-y-2">
+                        <Skeleton className="h-4 w-20" />
+                        <Skeleton className="h-20 w-full" />
+                    </div>
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-12" />
+                            <Skeleton className="h-10 w-full" />
+                        </div>
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-20" />
+                            <Skeleton className="h-10 w-full" />
+                        </div>
+                    </div>
+                     <div className="space-y-2">
+                        <Skeleton className="h-4 w-24" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                    <div className="space-y-2">
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                    <div className="flex justify-end gap-2">
+                         <Skeleton className="h-10 w-24" />
+                         <Skeleton className="h-10 w-32" />
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
+
+
 export default function ProductFormPage() {
   const params = useParams();
   const id = params.id as string;
@@ -51,6 +99,7 @@ export default function ProductFormPage() {
   const firestore = useFirestore();
   const router = useRouter();
   const { toast } = useToast();
+  const { user, isUserLoading } = useUser();
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
@@ -67,6 +116,12 @@ export default function ProductFormPage() {
   });
 
   useEffect(() => {
+    if (isUserLoading) return; // Wait until user check is complete
+    if (!user) {
+      router.replace('/admin/login'); // Redirect if not logged in
+      return;
+    }
+
     if (!isNew && firestore) {
       const fetchProduct = async () => {
         const docRef = doc(firestore, 'clothing_items', id);
@@ -90,10 +145,13 @@ export default function ProductFormPage() {
       };
       fetchProduct();
     }
-  }, [id, isNew, firestore, router, toast, form]);
+  }, [id, isNew, firestore, router, toast, form, user, isUserLoading]);
 
   const onSubmit: SubmitHandler<ProductFormValues> = async (data) => {
-    if (!firestore) return;
+    if (!firestore || !user) {
+        toast({ variant: 'destructive', title: 'Você precisa estar logado para salvar.' });
+        return;
+    };
     
     const productData = {
         name: data.name,
@@ -117,16 +175,14 @@ export default function ProductFormPage() {
         };
         addDoc(collectionRef, finalProductData)
             .then(docRef => {
-                // Set the ID in the document after creation
                 setDoc(doc(firestore, 'clothing_items', docRef.id), { id: docRef.id }, { merge: true })
                     .catch(error => {
                         const permissionError = new FirestorePermissionError({
                             path: docRef.path,
-                            operation: 'update', // or 'create' if this is the intended main operation
+                            operation: 'update',
                             requestResourceData: { id: docRef.id },
                         });
                         errorEmitter.emit('permission-error', permissionError);
-                        toast({ variant: 'destructive', title: 'Erro de permissão ao definir ID do produto.' });
                     })
                 toast({ title: 'Produto criado com sucesso!' });
                 router.push('/admin/products');
@@ -138,7 +194,6 @@ export default function ProductFormPage() {
                     requestResourceData: finalProductData,
                 });
                 errorEmitter.emit('permission-error', permissionError);
-                toast({ variant: 'destructive', title: 'Erro ao criar produto' });
             });
     } else {
         const docRef = doc(firestore, 'clothing_items', id);
@@ -154,10 +209,14 @@ export default function ProductFormPage() {
                     requestResourceData: productData,
                 });
                 errorEmitter.emit('permission-error', permissionError);
-                toast({ variant: 'destructive', title: 'Erro ao atualizar produto' });
             });
     }
   };
+
+  if (isUserLoading || !user) {
+    return <ProductFormSkeleton />;
+  }
+
 
   return (
     <Card>
