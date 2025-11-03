@@ -1,3 +1,100 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-1",
+      "description": "A stylish woman in a vibrant city setting.",
+      "imageUrl": "https://images.unsplash.com/photo-1578632292335-df3abbb0d586?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxmYXNoaW9uJTIwbW9kZWx8ZW58MHx8fHwxNzYyMDk3OTE0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "fashion model"
+    },
+    {
+      "id": "dress-1",
+      "description": "Elegant scarlet evening dress.",
+      "imageUrl": "https://images.unsplash.com/photo-1527189919029-aeb3d997547d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxyZWQlMjBkcmVzc3xlbnwwfHx8fDE3NjIxODc1NjR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "red dress"
+    },
+    {
+      "id": "blouse-1",
+      "description": "Chic beige silk blouse.",
+      "imageUrl": "https://images.unsplash.com/photo-1761117228880-df2425bd70da?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzaWxrJTIwYmxvdXNlfGVufDB8fHx8MTc2MjA4ODcyMXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "silk blouse"
+    },
+    {
+      "id": "trousers-1",
+      "description": "Classic black high-waisted trousers.",
+      "imageUrl": "https://images.unsplash.com/photo-1517771475020-40466834df9b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxibGFjayUyMHBhbnRzfGVufDB8fHx8MTc2MjE5MTE4NXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "black pants"
+    },
+    {
+      "id": "jacket-1",
+      "description": "Modern leather jacket.",
+      "imageUrl": "https://images.unsplash.com/photo-1602370463198-086436840055?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxsZWF0aGVyJTIwamFja2V0fGVufDB8fHx8MTc2MjE0NTQ5MHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "leather jacket"
+    },
+    {
+      "id": "skirt-1",
+      "description": "Flowy floral midi skirt.",
+      "imageUrl": "https://images.unsplash.com/photo-1625481253522-b3d0b7b658bb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxmbG9yYWwlMjBza2lydHxlbnwwfHx8fDE3NjIxNDY5NzV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "floral skirt"
+    },
+    {
+      "id": "accessory-1",
+      "description": "Gold statement necklace.",
+      "imageUrl": "https://images.unsplash.com/photo-1705326454924-f6777522b030?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxnb2xkJTIwbmVja2xhY2V8ZW58MHx8fHwxNzYyMTc5MTY4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "gold necklace"
+    },
+    {
+      "id": "shoes-1",
+      "description": "Elegant burgundy heels.",
+      "imageUrl": "https://images.unsplash.com/photo-1581101767113-1677fc2beaa8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8aGlnaCUyMGhlZWxzfGVufDB8fHx8MTc2MjE0NTg2OXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "high heels"
+    },
+    {
+      "id": "bag-1",
+      "description": "Designer leather handbag.",
+      "imageUrl": "https://images.unsplash.com/photo-1575295912464-fcfd1186d11d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxsZWF0aGVyJTIwaGFuZGJhZ3xlbnwwfHx8fDE3NjIxMjE0ODN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "leather handbag"
+    },
+    {
+      "id": "dress-2",
+      "description": "Casual summer linen dress.",
+      "imageUrl": "https://images.unsplash.com/photo-1617734876762-f5659a065b06?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8bGluZW4lMjBkcmVzc3xlbnwwfHx8fDE3NjIxOTExODV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "linen dress"
+    },
+    {
+      "id": "jeans-1",
+      "description": "Comfortable slim-fit denim jeans.",
+      "imageUrl": "https://images.unsplash.com/photo-1714143136372-ddaf8b606da7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxkZW5pbSUyMGplYW5zfGVufDB8fHx8MTc2MjE4MDcwM3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "denim jeans"
+    },
+    {
+      "id": "sweater-1",
+      "description": "Cozy cashmere sweater.",
+      "imageUrl": "https://images.unsplash.com/photo-1603906650843-b58e94d9df4d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjYXNobWVyZSUyMHN3ZWF0ZXJ8ZW58MHx8fHwxNzYyMTEzNjI1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "cashmere sweater"
+    },
+    {
+      "id": "style-guide-1",
+      "description": "Woman in a stylish outfit for a guide about weekend getaways.",
+      "imageUrl": "https://images.unsplash.com/photo-1756561896743-8eacb076d7dd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxzdHlsaXNoJTIwd29tYW58ZW58MHx8fHwxNzYyMTY4MzcwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "stylish woman"
+    },
+    {
+      "id": "style-guide-2",
+      "description": "A collection of clothes for an office wear style guide.",
+      "imageUrl": "https://images.unsplash.com/photo-1627260119158-13f1fca542a4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHx3b3JrJTIwb3V0Zml0fGVufDB8fHx8MTc2MjE5MTE4NXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "work outfit"
+    },
+    {
+      "id": "style-guide-3",
+      "description": "Elegant evening wear for a special occasion guide.",
+      "imageUrl": "https://images.unsplash.com/photo-1574868843985-6caab2f9e64c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxldmVuaW5nJTIwZHJlc3N8ZW58MHx8fHwxNzYyMTUyNTc3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "evening dress"
+    },
+    {
+      "id": "ai-advisor-cta",
+      "description": "A creatively dressed person, representing AI-powered style.",
+      "imageUrl": "https://images.unsplash.com/photo-1645300496319-0015f872f3d5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8Y3JlYXRpdmUlMjBmYXNoaW9ufGVufDB8fHx8MTc2MjE5MTE4NXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "creative fashion"
+    }
+  ]
 }
