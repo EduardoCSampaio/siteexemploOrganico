@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
-import { Wand2, Shirt, Loader2, ServerCrash, Star } from 'lucide-react';
+import { Wand2, Shirt, Loader2 } from 'lucide-react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -19,15 +18,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const recommendationsSchema = z.object({
-  userPreferences: z.string().min(10, "Por favor, descreva seu estilo com um pouco mais de detalhes."),
+  userPreferences: z.string().min(10, "Descreva seu estilo com mais detalhes."),
 });
 type RecommendationsFormValues = z.infer<typeof recommendationsSchema>;
 
 const outfitSchema = z.object({
-  occasion: z.string().min(3, "Por favor, especifique a ocasião."),
+  occasion: z.string().min(3, "Especifique a ocasião."),
   userPreferences: z.string().optional(),
 });
 type OutfitFormValues = z.infer<typeof outfitSchema>;
@@ -73,28 +71,28 @@ export function StyleAdvisorClient() {
   return (
     <Tabs defaultValue="outfit" className="w-full">
       <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="outfit"><Shirt className="mr-2 h-4 w-4" /> Gerador de Looks</TabsTrigger>
-        <TabsTrigger value="recommendations"><Wand2 className="mr-2 h-4 w-4" /> Personal Shopper</TabsTrigger>
+        <TabsTrigger value="outfit" className="text-xs"><Shirt className="mr-2 h-4 w-4" /> Gerador Look</TabsTrigger>
+        <TabsTrigger value="recommendations" className="text-xs"><Wand2 className="mr-2 h-4 w-4" /> Personal Shopper</TabsTrigger>
       </TabsList>
 
       {/* Gerador de Looks */}
       <TabsContent value="outfit">
         <Card>
           <CardHeader>
-            <CardTitle>Gerador de Looks com IA</CardTitle>
-            <CardDescription>Diga-nos a ocasião e nós criaremos o look perfeito para você.</CardDescription>
+            <CardTitle>Gerador de Looks</CardTitle>
+            <CardDescription>Diga-nos a ocasião e criaremos o look perfeito.</CardDescription>
           </CardHeader>
           <Form {...outfitForm}>
             <form onSubmit={outfitForm.handleSubmit(onOutfitSubmit)}>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 pt-4">
                 <FormField
                   control={outfitForm.control}
                   name="occasion"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Ocasião</FormLabel>
+                      <FormLabel className="text-xs">Ocasião</FormLabel>
                       <FormControl>
-                        <Input placeholder="Ex: Casamento de verão, brunch casual, reunião de negócios" {...field} />
+                        <Input className="text-xs" placeholder="Ex: Casamento, brunch, etc" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -105,9 +103,9 @@ export function StyleAdvisorClient() {
                   name="userPreferences"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Preferências (Opcional)</FormLabel>
+                      <FormLabel className="text-xs">Preferências (Opcional)</FormLabel>
                       <FormControl>
-                        <Textarea placeholder="Ex: Prefiro cores vibrantes, sapatos confortáveis e estilos modernos." {...field} />
+                        <Textarea className="text-xs" placeholder="Ex: Cores vibrantes, sapatos confortáveis" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -115,7 +113,7 @@ export function StyleAdvisorClient() {
                 />
               </CardContent>
               <CardFooter>
-                <Button type="submit" disabled={isLoading}>
+                <Button type="submit" disabled={isLoading} className="w-full font-game text-xs">
                   {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Shirt className="mr-2 h-4 w-4" />}
                   Gerar Look
                 </Button>
@@ -124,31 +122,36 @@ export function StyleAdvisorClient() {
           </Form>
         </Card>
         {isLoading && !outfit && (
-             <div className="text-center p-8 mt-4 bg-card rounded-lg">
+             <div className="text-center p-8 mt-4 bg-black/50 border-2 border-primary/30 rounded-lg">
                 <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
-                <p className="mt-4 text-lg text-muted-foreground">Nosso estilista de IA está criando seu look...</p>
+                <p className="mt-4 text-sm text-muted-foreground">Criando seu look...</p>
             </div>
         )}
         {outfit && (
           <Card className="mt-6">
             <CardHeader>
-              <CardTitle>Seu Look Curado por IA</CardTitle>
+              <CardTitle>Look por IA</CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="mb-6 text-lg text-muted-foreground">{outfit.outfitDescription}</p>
+            <CardContent className="pt-4">
+              <p className="mb-6 text-sm text-muted-foreground leading-relaxed">{outfit.outfitDescription}</p>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {outfit.items.map((item, index) => (
                   <Card key={index} className="overflow-hidden">
-                    <CardContent className="p-0">
-                      <Image src={item.imageUrl} alt={item.name} width={400} height={500} className="w-full object-cover" data-ai-hint="clothing item"/>
+                     <div className="p-2 border-b-2 border-primary/30">
+                        <h4 className="font-semibold text-xs text-primary truncate">{item.name}</h4>
+                     </div>
+                    <CardContent className="p-2">
+                       <div className="bg-black border-2 border-primary/30 p-1">
+                            <Image src={item.imageUrl} alt={item.name} width={400} height={500} className="w-full object-cover" data-ai-hint="clothing item"/>
+                       </div>
                     </CardContent>
-                    <div className="p-4">
-                      <h4 className="font-semibold">{item.name}</h4>
-                      <p className="text-sm text-muted-foreground mt-1">{item.description}</p>
-                      <div className="flex justify-between items-center mt-4">
-                        <p className="font-bold text-lg text-primary">R$ {item.price.toFixed(2).replace('.', ',')}</p>
-                        <Button variant="outline" size="sm">Ver Item</Button>
+                    <div className="p-2 space-y-2">
+                      <p className="text-xs text-muted-foreground leading-snug">{item.description}</p>
+                      <div className="flex justify-between items-center text-xs">
+                         <span className="text-muted-foreground">PREÇO:</span>
+                         <span className="font-bold text-primary">R$ {item.price.toFixed(2).replace('.', ',')}</span>
                       </div>
+                       <Button variant="outline" size="sm" className="w-full text-xs">Ver Item</Button>
                     </div>
                   </Card>
                 ))}
@@ -162,20 +165,20 @@ export function StyleAdvisorClient() {
       <TabsContent value="recommendations">
         <Card>
           <CardHeader>
-            <CardTitle>Personal Shopper com IA</CardTitle>
-            <CardDescription>Descreva seu estilo e nós sugeriremos itens da nossa coleção que você vai amar.</CardDescription>
+            <CardTitle>Personal Shopper</CardTitle>
+            <CardDescription>Descreva seu estilo e receba sugestões.</CardDescription>
           </CardHeader>
           <Form {...recommendationsForm}>
             <form onSubmit={recommendationsForm.handleSubmit(onRecommendationsSubmit)}>
-              <CardContent>
+              <CardContent className="pt-4">
                 <FormField
                   control={recommendationsForm.control}
                   name="userPreferences"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Seu Perfil de Estilo</FormLabel>
+                      <FormLabel className="text-xs">Seu Estilo</FormLabel>
                       <FormControl>
-                        <Textarea rows={4} placeholder="Ex: Eu amo um look minimalista com cores neutras. Eu visto principalmente básicos confortáveis e de alta qualidade. Minhas marcas favoritas são..." {...field} />
+                        <Textarea className="text-xs" rows={4} placeholder="Ex: Amo look minimalista com cores neutras..." {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -183,7 +186,7 @@ export function StyleAdvisorClient() {
                 />
               </CardContent>
               <CardFooter>
-                <Button type="submit" disabled={isLoading}>
+                <Button type="submit" disabled={isLoading} className="w-full font-game text-xs">
                     {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
                   Obter Recomendações
                 </Button>
@@ -192,22 +195,22 @@ export function StyleAdvisorClient() {
           </Form>
         </Card>
          {isLoading && !recommendations && (
-             <div className="text-center p-8 mt-4 bg-card rounded-lg">
+             <div className="text-center p-8 mt-4 bg-black/50 border-2 border-primary/30 rounded-lg">
                 <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
-                <p className="mt-4 text-lg text-muted-foreground">Analisando seu estilo...</p>
+                <p className="mt-4 text-sm text-muted-foreground">Analisando seu estilo...</p>
             </div>
         )}
         {recommendations && (
           <Card className="mt-6">
             <CardHeader>
-              <CardTitle>Com Base no Seu Estilo...</CardTitle>
+              <CardTitle>Recomendações</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-4">
                 <ul className="space-y-4">
                     {recommendations.recommendations.map((rec, index) => (
-                        <li key={index} className="flex items-start">
-                           <Star className="h-5 w-5 text-primary mr-3 mt-1 shrink-0" />
-                           <span className="text-muted-foreground">{rec}</span>
+                        <li key={index} className="flex items-start text-xs leading-relaxed text-muted-foreground">
+                           <span className="text-primary mr-2">»</span>
+                           <span>{rec}</span>
                         </li>
                     ))}
                 </ul>

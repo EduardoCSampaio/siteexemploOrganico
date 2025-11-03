@@ -7,9 +7,10 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col font-game relative">
+       <div className="absolute inset-0 scanlines z-0" />
       <Header />
-      <main className="flex-grow bg-background">{children}</main>
+      <main className="flex-grow z-10">{children}</main>
       <Footer />
     </div>
   );

@@ -1,11 +1,11 @@
 export default function AboutPage() {
   return (
     <div className="container py-12">
-      <div className="max-w-3xl mx-auto">
-        <h1 className="font-headline text-4xl md:text-5xl font-bold text-center mb-8">
+      <div className="max-w-3xl mx-auto text-center">
+        <h1 className="text-2xl md:text-3xl font-bold text-primary mb-8">
           Sobre Nós
         </h1>
-        <div className="space-y-6 text-lg text-muted-foreground text-justify">
+        <div className="space-y-6 text-xs leading-relaxed text-neutral-300 text-justify p-4 border-2 border-primary/30 bg-black/50">
           <p>
             Bem-vindo à Organico, onde a moda encontra a sustentabilidade. Nascemos da paixão por estilo e da crença de que é possível se vestir bem e cuidar do planeta.
           </p>

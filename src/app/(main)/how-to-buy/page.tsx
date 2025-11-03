@@ -5,22 +5,22 @@ const steps = [
   {
     icon: ShoppingCart,
     title: "1. Navegue e Escolha",
-    description: "Explore nossa coleção e adicione seus itens favoritos ao carrinho de compras.",
+    description: "Explore nossa coleção e adicione seus itens favoritos ao carrinho.",
   },
   {
     icon: CreditCard,
     title: "2. Finalize a Compra",
-    description: "Vá para o checkout, preencha seus dados de entrega e escolha a forma de pagamento.",
+    description: "Vá para o checkout, preencha seus dados e escolha o pagamento.",
   },
   {
     icon: Package,
-    title: "3. Confirmação do Pedido",
-    description: "Após a confirmação do pagamento, seu pedido será preparado para envio com todo o cuidado.",
+    title: "3. Confirmação",
+    description: "Após a confirmação, seu pedido será preparado para envio.",
   },
   {
     icon: Truck,
     title: "4. Receba em Casa",
-    description: "Enviaremos seu pedido para o endereço informado. Agora é só aguardar para arrasar com seus novos looks!",
+    description: "Enviaremos seu pedido. Agora é só aguardar para arrasar!",
   },
 ];
 
@@ -28,10 +28,10 @@ export default function HowToBuyPage() {
   return (
     <div className="container py-12">
       <div className="text-center mb-12">
-        <h1 className="font-headline text-4xl md:text-5xl font-bold">
+        <h1 className="text-2xl md:text-3xl text-primary">
           Como Comprar
         </h1>
-        <p className="mt-3 max-w-2xl mx-auto text-lg text-muted-foreground">
+        <p className="mt-3 max-w-2xl mx-auto text-xs text-muted-foreground">
           Seguir estes passos simples tornará sua experiência de compra rápida e fácil.
         </p>
       </div>
@@ -39,14 +39,14 @@ export default function HowToBuyPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {steps.map((step, index) => (
           <Card key={index} className="text-center">
-            <CardHeader>
-              <div className="mx-auto bg-primary text-primary-foreground rounded-full h-16 w-16 flex items-center justify-center">
+            <CardHeader className="border-b-0">
+              <div className="mx-auto bg-primary/20 text-primary border-2 border-primary/50 rounded-full h-16 w-16 flex items-center justify-center">
                 <step.icon className="h-8 w-8" />
               </div>
             </CardHeader>
-            <CardContent>
-              <CardTitle className="mb-2 text-xl font-headline">{step.title}</CardTitle>
-              <p className="text-muted-foreground">{step.description}</p>
+            <CardContent className="pt-4">
+              <CardTitle className="mb-2 text-sm">{step.title}</CardTitle>
+              <p className="text-muted-foreground text-xs leading-relaxed">{step.description}</p>
             </CardContent>
           </Card>
         ))}
