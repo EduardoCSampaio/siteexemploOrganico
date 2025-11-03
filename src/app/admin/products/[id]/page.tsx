@@ -12,7 +12,7 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -43,8 +43,9 @@ const productSchema = z.object({
 
 type ProductFormValues = z.infer<typeof productSchema>;
 
-export default function ProductFormPage({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default function ProductFormPage() {
+  const params = useParams();
+  const id = params.id as string;
   const isNew = id === 'new';
   const firestore = useFirestore();
   const router = useRouter();
