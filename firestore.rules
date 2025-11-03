@@ -62,7 +62,7 @@ service cloud.firestore {
       }
 
       allow get, list: if true;
-      allow create: if isAdmin();
+      allow create: if request.auth != null && isAdmin();
       allow update: if isAdmin() && resource != null;
       allow delete: if isAdmin() && resource != null;
     }
