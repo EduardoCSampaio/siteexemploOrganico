@@ -4,7 +4,7 @@ export function Logo({ className }: { className?: string }) {
   return (
     <div
       className={cn("font-headline text-xl font-bold tracking-wider", className)}
-      suppressHydrationWarning
+      suppressHydrationWarning={true}
     >
       Organico
       <span className="text-primary">.</span>
