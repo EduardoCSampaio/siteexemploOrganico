@@ -40,7 +40,7 @@ export default function GameHomePage() {
       <div className="absolute inset-0 scanlines" />
       {!gameStarted ? (
         <div className="text-center animate-fade-in z-10">
-          <Logo className="h-24 w-auto md:h-32 text-primary drop-shadow-lg" />
+          <Logo className="h-32 w-auto md:h-48 text-primary drop-shadow-lg" />
           <p className="mt-6 text-lg text-neutral-400 animate-blink">Aperte play para começar</p>
           <Button
             size="lg"
