@@ -1,0 +1,20 @@
+import { Footer } from '@/components/layout/Footer';
+import { Header } from '@/components/layout/Header';
+import { CartProvider } from '@/context/cart-context';
+
+export default function AuthLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <CartProvider>
+      <div className="flex min-h-screen flex-col font-game relative">
+        <div className="absolute inset-0 scanlines z-0" />
+        <Header />
+        <main className="flex-grow z-10 animate-fade-in">{children}</main>
+        <Footer />
+      </div>
+    </CartProvider>
+  );
+}
