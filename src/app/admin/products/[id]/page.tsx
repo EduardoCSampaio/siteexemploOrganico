@@ -6,12 +6,11 @@ import { z } from 'zod';
 import {
   doc,
   setDoc,
-  getDoc,
   addDoc,
   collection,
   serverTimestamp,
 } from 'firebase/firestore';
-import { useFirestore, useUser } from '@/firebase';
+import { useDoc, useFirestore, useUser } from '@/firebase';
 import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,6 +28,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { FirestorePermissionError } from '@/firebase/errors';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useMemoFirebase } from '@/firebase/provider';
+import { Product } from '@/lib/data';
 
 const productSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
@@ -102,6 +103,12 @@ export default function ProductFormPage() {
   const { toast } = useToast();
   const { user, isUserLoading } = useUser();
 
+  const productRef = useMemoFirebase(
+    () => (!isNew && firestore && id ? doc(firestore, 'clothing_items', id) : null),
+    [isNew, firestore, id]
+  );
+  const { data: product, isLoading: isProductLoading } = useDoc<Product>(productRef);
+
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
     defaultValues: {
@@ -117,36 +124,25 @@ export default function ProductFormPage() {
   });
 
   useEffect(() => {
-    if (isUserLoading) return; // Wait until user check is complete
+    if (isUserLoading) return;
     if (!user) {
-      router.replace('/admin/login'); // Redirect if not logged in
+      router.replace('/admin/login');
       return;
     }
 
-    if (!isNew && firestore && id) {
-      const fetchProduct = async () => {
-        const docRef = doc(firestore, 'clothing_items', id);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          form.reset({
-            name: data.name,
-            description: data.description,
-            price: data.price,
-            category: data.category,
-            imageUrl: data.image?.imageUrl || '',
-            imageHint: data.image?.imageHint || '',
-            sizes: Array.isArray(data.sizes) ? data.sizes.join(', ') : '',
-            colors: Array.isArray(data.colors) ? data.colors.join(', ') : '',
-          } as any);
-        } else {
-          toast({ variant: 'destructive', title: 'Produto não encontrado.' });
-          router.push('/admin/products');
-        }
-      };
-      fetchProduct();
+    if (product) {
+        form.reset({
+            name: product.name,
+            description: product.description,
+            price: product.price,
+            category: product.category,
+            imageUrl: product.image?.imageUrl || '',
+            imageHint: product.image?.imageHint || '',
+            sizes: Array.isArray(product.sizes) ? product.sizes.join(', ') : '',
+            colors: Array.isArray(product.colors) ? product.colors.join(', ') : '',
+        } as any);
     }
-  }, [id, isNew, firestore, router, toast, form, user, isUserLoading]);
+  }, [user, isUserLoading, router, product, form]);
 
   const onSubmit: SubmitHandler<ProductFormValues> = async (data) => {
     if (!firestore || !user) {
@@ -205,7 +201,7 @@ export default function ProductFormPage() {
     }
   };
 
-  if (isUserLoading || !user) {
+  if (isUserLoading || (!isNew && isProductLoading)) {
     return <ProductFormSkeleton />;
   }
 
