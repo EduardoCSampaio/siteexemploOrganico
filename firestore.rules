@@ -35,12 +35,13 @@ service cloud.firestore {
     }
 
     /**
-     * @description: Protects user profiles. Only the user with the matching userId can read/write their profile.
+     * @description: Protects user profiles. Only the user with the matching userId can read/write their profile. Admins can list all users.
      * @path: /users/{userId}
      * @allow: User (create) can create their own profile if the userId matches their auth.uid.
      * @allow: User (get, update, delete) can access their profile if the userId matches their auth.uid.
+     * @allow: Admin (list) can list all user profiles.
      * @deny: User cannot access another user's profile.
-     * @principle: Enforces document ownership for all operations on user profiles.
+     * @principle: Enforces document ownership for user operations and allows admin listing.
      */
     match /users/{userId} {
       allow get: if isOwner(userId);
