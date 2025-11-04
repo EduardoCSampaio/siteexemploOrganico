@@ -65,8 +65,8 @@ export function useCollection<T = any>(
   useEffect(() => {
     // If the reference/query is not yet available, set loading state and wait.
     if (!memoizedTargetRefOrQuery) {
-      setIsLoading(true); // Explicitly set loading to true
-      setData(null);      // Reset data
+      setIsLoading(true);
+      setData(null);
       setError(null);
       return;
     }
