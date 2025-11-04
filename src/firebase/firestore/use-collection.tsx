@@ -59,31 +59,21 @@ export function useCollection<T = any>(
   type StateDataType = ResultItemType[] | null;
 
   const [data, setData] = useState<StateDataType>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true); // Start as true
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<FirestoreError | Error | null>(null);
 
-  // This check is the crucial fix. If the query isn't ready, we don't proceed.
-  if (!memoizedTargetRefOrQuery && !error) {
-    if (data !== null || isLoading !== false) {
-        // This effect ensures we reset state only when needed, preventing render loops.
-        useEffect(() => {
-            setData(null);
-            setIsLoading(false);
-        }, []);
-    }
-    return { data: null, isLoading: false, error: null };
-  }
-
   useEffect(() => {
-    // A second check inside the effect to handle dependency changes.
+    // If the reference/query is not yet available, set loading state and wait.
     if (!memoizedTargetRefOrQuery) {
-      setData(null);
-      setIsLoading(false);
+      setIsLoading(true); // Explicitly set loading to true
+      setData(null);      // Reset data
       setError(null);
       return;
     }
 
+    // Reference is available, start the snapshot listener.
     setIsLoading(true);
+    setError(null);
     
     const unsubscribe = onSnapshot(
       memoizedTargetRefOrQuery,

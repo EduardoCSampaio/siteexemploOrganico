@@ -48,13 +48,15 @@ export function useDoc<T = any>(
   const [error, setError] = useState<FirestoreError | Error | null>(null);
 
   useEffect(() => {
+    // If the reference is not yet available, set loading state and wait.
     if (!memoizedDocRef) {
-      setData(null);
-      setIsLoading(false);
+      setIsLoading(true); // Explicitly set loading to true
+      setData(undefined); // Reset data
       setError(null);
       return;
     }
 
+    // Reference is available, start the snapshot listener.
     setIsLoading(true);
     setData(undefined);
     setError(null);
