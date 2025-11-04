@@ -146,13 +146,9 @@
       "type": "object",
       "description": "Represents a customer order.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the order."
-        },
         "userId": {
           "type": "string",
-          "description": "Reference to the user who placed the order. (Relationship: User 1:N Order)"
+          "description": "Reference to the user who placed the order."
         },
         "orderDate": {
           "type": "string",
@@ -163,24 +159,21 @@
           "type": "number",
           "description": "Total amount of the order."
         },
-        "shippingAddress": {
-          "type": "string",
-          "description": "Shipping address for the order."
+        "status": {
+            "type": "string",
+            "description": "The current status of the order.",
+            "enum": ["processing", "shipped", "delivered", "cancelled"]
         },
-        "orderItemIds": {
-          "type": "array",
-          "description": "References to order items included in the order. (Relationship: Order 1:N OrderItem)",
-          "items": {
-            "type": "string"
-          }
+        "shippingAddress": {
+          "type": "object",
+          "description": "Shipping address for the order."
         }
       },
       "required": [
-        "id",
         "userId",
         "orderDate",
         "totalAmount",
-        "shippingAddress"
+        "status"
       ]
     },
     "OrderItem": {
@@ -189,17 +182,8 @@
       "type": "object",
       "description": "Represents an item within an order.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the order item."
-        },
-        "orderId": {
-          "type": "string",
-          "description": "Reference to the order this item belongs to. (Relationship: Order 1:N OrderItem)"
-        },
-        "clothingItemId": {
-          "type": "string",
-          "description": "Reference to the clothing item. (Relationship: ClothingItem 1:N OrderItem)"
+        "name": {
+            "type": "string"
         },
         "quantity": {
           "type": "number",
@@ -208,12 +192,14 @@
         "price": {
           "type": "number",
           "description": "Price of the clothing item at the time of the order."
+        },
+        "image": {
+            "type": "string",
+            "format": "uri"
         }
       },
       "required": [
-        "id",
-        "orderId",
-        "clothingItemId",
+        "name",
         "quantity",
         "price"
       ]

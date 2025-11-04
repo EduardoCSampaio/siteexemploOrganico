@@ -34,14 +34,12 @@ export async function POST(request: NextRequest) {
       mode: 'payment',
       success_url: `${appUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/cancel`,
-      billing_address_collection: 'required', // Alterado de 'auto' para 'required' para suportar boleto
+      shipping_address_collection: {
+          allowed_countries: ['BR'],
+      },
+      billing_address_collection: 'required',
       tax_id_collection: {
         enabled: true,
-      },
-      payment_method_options: {
-        boleto: {
-          expires_after_days: 3,
-        },
       },
     });
 
