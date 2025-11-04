@@ -69,6 +69,9 @@ export default {
         md: 'var(--radius)',
         sm: 'var(--radius)',
       },
+      letterSpacing: {
+        widest: '.2em',
+      },
       keyframes: {
         'accordion-down': {
           from: {
@@ -103,6 +106,10 @@ export default {
         'blink': {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.4' },
+        },
+        'blink-cursor': {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0' },
         }
       },
       animation: {
@@ -111,6 +118,7 @@ export default {
         'fade-in': 'fade-in 0.5s ease-out forwards',
         'fade-in-up': 'fade-in-up 0.5s ease-out forwards',
         'blink': 'blink 1.5s infinite step-end',
+        'blink-cursor': 'blink-cursor 1s infinite step-end',
       },
       animationDelay: {
         '300': '300ms',

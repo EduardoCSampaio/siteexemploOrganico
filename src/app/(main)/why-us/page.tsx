@@ -1,3 +1,4 @@
+import { AnimatedHeader } from "@/components/AnimatedHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sparkles, Gem, ShieldCheck, Bot } from "lucide-react";
 
@@ -28,9 +29,7 @@ export default function WhyUsPage() {
   return (
     <div className="container py-12">
       <div className="text-center mb-12">
-        <h1 className="text-2xl md:text-3xl text-primary">
-          Por Que Nos Escolher?
-        </h1>
+        <AnimatedHeader text="Por Que Nos Escolher?" />
         <p className="mt-3 max-w-2xl mx-auto text-xs text-muted-foreground">
           Descubra os diferenciais que tornam nossa boutique o seu destino preferido.
         </p>

@@ -1,3 +1,4 @@
+import { AnimatedHeader } from "@/components/AnimatedHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShoppingCart, CreditCard, Package, Truck } from "lucide-react";
 
@@ -28,9 +29,7 @@ export default function HowToBuyPage() {
   return (
     <div className="container py-12">
       <div className="text-center mb-12">
-        <h1 className="text-2xl md:text-3xl text-primary">
-          Como Comprar
-        </h1>
+        <AnimatedHeader text="Como Comprar" />
         <p className="mt-3 max-w-2xl mx-auto text-xs text-muted-foreground">
           Seguir estes passos simples tornará sua experiência de compra rápida e fácil.
         </p>

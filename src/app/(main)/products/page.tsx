@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { collection } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AnimatedHeader } from '@/components/AnimatedHeader';
 
 function ProductCardSkeleton() {
   return (
@@ -72,7 +73,7 @@ export default function ProductsPage() {
   return (
     <div className="container py-12">
       <div className="text-center mb-12">
-        <h1 className="text-2xl md:text-3xl text-primary mb-4">Inventário</h1>
+        <AnimatedHeader text="Inventário" />
         <p className="mt-3 max-w-2xl mx-auto text-xs text-muted-foreground">
           Descubra peças atemporais, elegantes e com a sua cara.
         </p>

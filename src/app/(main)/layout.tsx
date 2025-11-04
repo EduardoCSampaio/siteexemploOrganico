@@ -8,9 +8,9 @@ export default function MainLayout({
 }) {
   return (
     <div className="flex min-h-screen flex-col font-game relative">
-       <div className="absolute inset-0 scanlines z-0" />
+      <div className="absolute inset-0 scanlines z-0" />
       <Header />
-      <main className="flex-grow z-10">{children}</main>
+      <main className="flex-grow z-10 animate-fade-in">{children}</main>
       <Footer />
     </div>
   );
