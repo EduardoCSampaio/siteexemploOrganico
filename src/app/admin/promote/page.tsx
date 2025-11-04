@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { useAuth, useFirestore } from '@/firebase';
+import { useUser, useFirestore } from '@/firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -19,7 +19,7 @@ import { errorEmitter } from '@/firebase/error-emitter';
 
 export default function PromoteAdminPage() {
   const [isLoading, setIsLoading] = useState(false);
-  const { user } = useAuth();
+  const { user } = useUser();
   const firestore = useFirestore();
   const { toast } = useToast();
   const router = useRouter();
