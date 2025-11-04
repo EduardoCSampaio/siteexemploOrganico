@@ -176,15 +176,6 @@ export default function ProductFormPage() {
         };
         addDoc(collectionRef, finalProductData)
             .then(docRef => {
-                setDoc(doc(firestore, 'clothing_items', docRef.id), { id: docRef.id }, { merge: true })
-                    .catch(error => {
-                        const permissionError = new FirestorePermissionError({
-                            path: docRef.path,
-                            operation: 'update',
-                            requestResourceData: { id: docRef.id },
-                        });
-                        errorEmitter.emit('permission-error', permissionError);
-                    })
                 toast({ title: 'Produto criado com sucesso!' });
                 router.push('/admin/products');
             })

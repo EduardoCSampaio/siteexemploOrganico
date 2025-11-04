@@ -32,6 +32,8 @@ import {
 import { Edit, Plus, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
+import { FirestorePermissionError } from '@/firebase/errors';
+import { errorEmitter } from '@/firebase/error-emitter';
 
 function ProductRowSkeleton() {
     return (
@@ -61,15 +63,23 @@ export default function AdminProductsPage() {
 
   const handleDeleteProduct = async () => {
     if (!productToDelete || !firestore) return;
-    try {
-      await deleteDoc(doc(firestore, 'clothing_items', productToDelete));
-      toast({ title: 'Produto excluído com sucesso!' });
-    } catch (error) {
-      toast({ variant: 'destructive', title: 'Erro ao excluir produto.' });
-      console.error(error);
-    } finally {
-      setProductToDelete(null);
-    }
+    
+    const docRef = doc(firestore, 'clothing_items', productToDelete);
+
+    deleteDoc(docRef)
+      .then(() => {
+        toast({ title: 'Produto excluído com sucesso!' });
+      })
+      .catch(error => {
+        const permissionError = new FirestorePermissionError({
+            path: docRef.path,
+            operation: 'delete',
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      })
+      .finally(() => {
+        setProductToDelete(null);
+      });
   };
 
   return (
