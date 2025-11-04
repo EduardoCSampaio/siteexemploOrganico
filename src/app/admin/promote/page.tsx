@@ -54,7 +54,7 @@ export default function PromoteAdminPage() {
         router.push('/admin');
       })
       .catch((error) => {
-        const permissionError = new FirestorePermissionError({
+        const permissionError = FirestorePermissionError({
           path: adminRoleRef.path,
           operation: 'create',
           requestResourceData: adminData,
