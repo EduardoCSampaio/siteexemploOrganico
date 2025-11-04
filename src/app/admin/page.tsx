@@ -110,16 +110,10 @@ function RecentOrders({ orders, isLoading }: { orders: Order[] | null, isLoading
 
 export default function AdminDashboardPage() {
   const { user, isUserLoading } = useUser();
-  const router = useRouter();
   const firestore = useFirestore();
+  const router = useRouter();
 
-  useEffect(() => {
-    if (!isUserLoading && !user) {
-      router.replace('/admin/login');
-    }
-  }, [user, isUserLoading, router]);
-
-  const queriesReady = !!firestore && !!user;
+  const queriesReady = !!firestore && !!user && !isUserLoading;
 
   const allOrdersQuery = useMemoFirebase(
     () => (queriesReady ? query(collectionGroup(firestore, 'orders')) : null),
