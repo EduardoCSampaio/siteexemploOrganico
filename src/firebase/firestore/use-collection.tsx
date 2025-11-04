@@ -40,7 +40,7 @@ export function useCollection<T = any>(
   const [error, setError] = useState<FirestoreError | Error | null>(null);
 
   useEffect(() => {
-    // Se a referência/query for nula, reseta o estado e não faz nada.
+    // If the reference is not yet available, set loading state and wait.
     if (!memoizedTargetRefOrQuery) {
       setIsLoading(true);
       setData(null);
@@ -48,7 +48,7 @@ export function useCollection<T = any>(
       return;
     }
 
-    // A referência é válida, então ativa o listener.
+    // A valid reference is present, set up the listener.
     const unsubscribe = onSnapshot(
       memoizedTargetRefOrQuery,
       (snapshot: QuerySnapshot<DocumentData>) => {
@@ -78,7 +78,7 @@ export function useCollection<T = any>(
       }
     );
 
-    // Limpeza: desinscreve do listener quando o componente desmonta ou a dependência muda.
+    // Cleanup: desubscribe from the listener when the component unmounts or the dependency changes.
     return () => unsubscribe();
   }, [memoizedTargetRefOrQuery]);
 
