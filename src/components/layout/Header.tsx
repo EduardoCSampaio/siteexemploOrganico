@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Home, User as UserIcon, LogOut, FileText } from "lucide-react";
+import { Home, User as UserIcon, LogOut, FileText, Heart } from "lucide-react";
 import { Logo } from "@/components/icons";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -77,6 +77,12 @@ function UserNav() {
             <span>Meus Pedidos</span>
           </Link>
         </DropdownMenuItem>
+         <DropdownMenuItem asChild>
+          <Link href="/account/favorites">
+            <Heart className="mr-2 h-4 w-4" />
+            <span>Favoritos</span>
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut}>
           <LogOut className="mr-2 h-4 w-4" />
@@ -96,16 +102,11 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-primary/20 bg-black/50 backdrop-blur-sm">
       <div className="container flex h-16 items-center">
-        <Link href="/" className="flex items-center gap-2 text-primary hover:text-white transition-colors">
-          <Home className="h-5 w-5" />
-          <span className="text-xs hidden sm:inline">Menu</span>
+        <Link href="/" className="mr-auto">
+          <Logo className="h-10 w-40" />
         </Link>
         
-        <div className="hidden md:flex mx-auto">
-            <Logo />
-        </div>
-
-        <nav className="ml-auto hidden lg:flex items-center space-x-4 text-xs">
+        <nav className="hidden lg:flex items-center space-x-4 text-xs">
           {navLinks.map(link => (
              <Link
              key={link.href}

@@ -1,8 +1,8 @@
 'use client';
 
-import { doc } from 'firebase/firestore';
+import { doc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import Image from 'next/image';
-import { notFound, useParams } from 'next/navigation';
+import { notFound, useParams, useRouter } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -12,12 +12,60 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useDoc, useFirestore } from '@/firebase';
+import { useDoc, useFirestore, useUser } from '@/firebase';
 import { Product } from '@/lib/data';
 import { useMemoFirebase } from '@/firebase/provider';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useCart } from '@/context/cart-context';
 import { useToast } from '@/hooks/use-toast';
+import { Heart } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+function FavoriteButton({ productId }: { productId: string }) {
+    const { user } = useUser();
+    const firestore = useFirestore();
+    const router = useRouter();
+    const { toast } = useToast();
+
+    const userProfileRef = useMemoFirebase(() => {
+        if (!firestore || !user?.uid) return null;
+        return doc(firestore, 'users', user.uid);
+    }, [firestore, user?.uid]);
+
+    const { data: userProfile } = useDoc<{ favoriteItemIds?: string[] }>(userProfileRef);
+
+    const isFavorited = userProfile?.favoriteItemIds?.includes(productId);
+
+    const handleFavorite = async () => {
+        if (!user || !firestore) {
+            router.push(`/login?from=/products/${productId}`);
+            return;
+        }
+
+        const userRef = doc(firestore, 'users', user.uid);
+        try {
+            await updateDoc(userRef, {
+                favoriteItemIds: isFavorited ? arrayRemove(productId) : arrayUnion(productId)
+            });
+            toast({
+                title: isFavorited ? 'Removido dos favoritos!' : 'Adicionado aos favoritos!',
+            });
+        } catch (error) {
+             toast({
+                variant: 'destructive',
+                title: 'Erro!',
+                description: 'Não foi possível atualizar seus favoritos.',
+            });
+        }
+    }
+
+    return (
+        <Button onClick={handleFavorite} className="w-full font-game text-sm flex items-center" variant="outline">
+             <Heart className={cn("mr-2 h-4 w-4", isFavorited && "fill-current text-primary")} />
+             {isFavorited ? 'Remover dos Favoritos' : 'Adicionar aos Favoritos'}
+        </Button>
+    )
+}
 
 function ProductDetailsSkeleton() {
   return (
@@ -65,6 +113,7 @@ function ProductDetailsSkeleton() {
                   <Skeleton className="h-6 w-24" />
                 </div>
                 <Skeleton className="h-10 w-full" />
+                 <Skeleton className="h-10 w-full" />
               </div>
             </div>
           </div>
@@ -176,6 +225,7 @@ export default function ProductDetailsPage() {
                 <Button onClick={handleAddToCart} className="w-full font-game text-sm">
                   Adicionar ao Carrinho
                 </Button>
+                <FavoriteButton productId={product.id} />
               </div>
             </div>
           </div>
