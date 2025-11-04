@@ -14,7 +14,7 @@ import {
 import { LogOut, Shirt, LayoutDashboard, Home, ShoppingCart, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth, useUser } from '@/firebase';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 export default function AdminLayout({
@@ -25,9 +25,10 @@ export default function AdminLayout({
   const auth = useAuth();
   const { user, isUserLoading } = useUser();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
-    // Redireciona se, após o carregamento, não houver usuário.
+    // Se o usuário não estiver carregando e não houver usuário, redirecione para a página de login
     if (!isUserLoading && !user) {
       router.replace('/admin/login');
     }
@@ -49,6 +50,11 @@ export default function AdminLayout({
         </div>
     </div>
   )
+
+  // Se estiver na página de login, não renderize o layout do admin
+  if (pathname === '/admin/login') {
+    return <>{children}</>;
+  }
 
   // Não renderiza nada do layout principal até que o usuário seja verificado.
   if (isUserLoading || !user) {
