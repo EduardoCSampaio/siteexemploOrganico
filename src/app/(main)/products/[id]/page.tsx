@@ -2,7 +2,7 @@
 
 import { doc } from 'firebase/firestore';
 import Image from 'next/image';
-import { notFound } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -66,8 +66,9 @@ function ProductDetailsSkeleton() {
 }
 
 
-export default function ProductDetailsPage({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default function ProductDetailsPage() {
+  const params = useParams();
+  const id = params.id as string;
   
   const firestore = useFirestore();
   const productRef = useMemoFirebase(
