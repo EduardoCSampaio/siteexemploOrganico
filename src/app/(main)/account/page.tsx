@@ -11,6 +11,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { format } from 'date-fns';
 import Image from 'next/image';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
 
 interface OrderItem {
   id: string;
@@ -28,7 +29,7 @@ interface Order {
   };
   totalAmount: number;
   status: string;
-  items?: OrderItem[]; // Será preenchido separadamente
+  items?: OrderItem[];
 }
 
 interface UserProfile {
@@ -37,6 +38,20 @@ interface UserProfile {
     email: string;
 }
 
+const statusTranslations: { [key: string]: string } = {
+    processing: 'Processando',
+    shipped: 'Enviado',
+    delivered: 'Entregue',
+    cancelled: 'Cancelado'
+};
+
+const statusColors: { [key: string]: string } = {
+    processing: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/50',
+    shipped: 'bg-blue-500/20 text-blue-300 border-blue-500/50',
+    delivered: 'bg-green-500/20 text-green-300 border-green-500/50',
+    cancelled: 'bg-red-500/20 text-red-300 border-red-500/50'
+};
+
 
 function OrderItemCard({ orderId }: { orderId: string }) {
     const { user } = useUser();
@@ -44,7 +59,7 @@ function OrderItemCard({ orderId }: { orderId: string }) {
 
     const orderItemsQuery = useMemoFirebase(() => {
         if (!firestore || !user?.uid || !orderId) return null;
-        return collection(firestore, 'users', user.uid, 'orders', orderId, 'order_items');
+        return collection(firestore, `users/${user.uid}/orders/${orderId}/order_items`);
     }, [firestore, user?.uid, orderId]);
     
     const { data: items, isLoading } = useCollection<OrderItem>(orderItemsQuery);
@@ -61,7 +76,7 @@ function OrderItemCard({ orderId }: { orderId: string }) {
         <div className="space-y-3">
             {items?.map(item => (
                 <div key={item.id} className="flex gap-3 items-center bg-black/30 p-2">
-                    <Image src={item.image} alt={item.name} width={60} height={80} className="object-cover border-2 border-primary/30"/>
+                    <Image src={item.image || 'https://placehold.co/60x80'} alt={item.name} width={60} height={80} className="object-cover border-2 border-primary/30"/>
                     <div className="flex-grow">
                         <p className="text-xs font-semibold text-primary">{item.name}</p>
                         <p className="text-xs text-muted-foreground">Qtd: {item.quantity}</p>
@@ -185,8 +200,13 @@ export default function AccountPage() {
                                 {orders.sort((a,b) => b.orderDate.seconds - a.orderDate.seconds).map(order => (
                                     <AccordionItem value={order.id} key={order.id}>
                                         <AccordionTrigger>
-                                            <div className="flex justify-between w-full pr-4 text-xs">
-                                                <span>Pedido de {format(new Date(order.orderDate.seconds * 1000), 'dd/MM/yyyy')}</span>
+                                            <div className="flex justify-between items-center w-full pr-4 text-xs">
+                                                <div className="flex flex-col items-start gap-1">
+                                                    <span>Pedido de {format(new Date(order.orderDate.seconds * 1000), 'dd/MM/yyyy')}</span>
+                                                    <Badge className={cn("text-xs border", statusColors[order.status] || 'bg-gray-500')}>
+                                                        {statusTranslations[order.status] || order.status}
+                                                    </Badge>
+                                                </div>
                                                 <span className="font-bold text-primary">R$ {order.totalAmount.toFixed(2).replace('.', ',')}</span>
                                             </div>
                                         </AccordionTrigger>

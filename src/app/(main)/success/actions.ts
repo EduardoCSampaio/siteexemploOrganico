@@ -1,27 +1,14 @@
 'use server';
 
 import { stripe } from '@/lib/stripe';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
-import { getSdks } from '@/firebase'; // Usando a função de inicialização do servidor
-
-interface LineItem {
-    price_data: {
-        currency: string;
-        product_data: {
-            name: string;
-            images: string[];
-        };
-        unit_amount_decimal: string;
-    };
-    quantity: number;
-}
+import { addDoc, collection, serverTimestamp, doc } from 'firebase/firestore';
+import { getSdks } from '@/firebase';
 
 export async function saveOrderAction(sessionId: string, userId: string) {
     if (!sessionId || !userId) {
         throw new Error("ID da sessão ou ID do usuário ausente.");
     }
-    
-    // Inicialize o Firestore no lado do servidor
+
     const { firestore } = getSdks();
 
     try {
@@ -42,7 +29,7 @@ export async function saveOrderAction(sessionId: string, userId: string) {
             userId: userId,
             orderDate: serverTimestamp(),
             totalAmount: session.amount_total ? session.amount_total / 100 : 0,
-            status: 'processing',
+            status: 'processing', // Status inicial
             shippingAddress: session.shipping_details ? {
                 name: session.shipping_details.name,
                 address: {
@@ -56,20 +43,21 @@ export async function saveOrderAction(sessionId: string, userId: string) {
             } : null,
         };
 
-        // Salva o documento do pedido
         const ordersRef = collection(firestore, 'users', userId, 'orders');
         const orderDocRef = await addDoc(ordersRef, orderData);
 
-        // Salva os itens do pedido em uma subcoleção
         const orderItemsRef = collection(orderDocRef, 'order_items');
         for (const item of lineItems) {
-            const product = item.price?.product as any;
-            await addDoc(orderItemsRef, {
-                name: product.name,
-                quantity: item.quantity,
-                price: item.price?.unit_amount ? item.price.unit_amount / 100 : 0,
-                image: product.images?.[0] || null,
-            });
+            const product = item.price?.product as any; // 'any' to access Stripe object properties
+            if (item.quantity) {
+                 await addDoc(orderItemsRef, {
+                    name: product.name,
+                    quantity: item.quantity,
+                    price: item.price?.unit_amount ? item.price.unit_amount / 100 : 0,
+                    // Garante que a imagem seja extraída corretamente
+                    image: product.images && product.images.length > 0 ? product.images[0] : null,
+                });
+            }
         }
 
         return { success: true, orderId: orderDocRef.id };
