@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:9002';
 
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card', 'pix', 'boleto'],
+      payment_method_types: ['card', 'boleto'],
       line_items,
       mode: 'payment',
       success_url: `${appUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
