@@ -8,6 +8,7 @@ import { Button } from '../ui/button';
 import { ScrollArea } from '../ui/scroll-area';
 import { Trash2, Plus, Minus, ShoppingCart, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { useToast } from '@/hooks/use-toast';
 
 function CartItemCard({ item }: { item: CartItem }) {
     const { updateItemQuantity, removeItem } = useCart();
@@ -48,15 +49,37 @@ function CartItemCard({ item }: { item: CartItem }) {
 export function CartContent() {
     const { cartItems, subtotal, cartCount, clearCart } = useCart();
     const [isLoading, setIsLoading] = useState(false);
+    const { toast } = useToast();
 
     const handleCheckout = async () => {
         setIsLoading(true);
-        console.log("Iniciando checkout...");
-        // A lógica para criar a sessão de checkout do Stripe virá aqui.
-        // Por enquanto, apenas simulamos o carregamento.
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        console.log("Checkout finalizado (simulação).");
-        setIsLoading(false);
+        try {
+            const response = await fetch('/api/checkout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ cartItems }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Falha ao criar a sessão de checkout.');
+            }
+
+            const { url } = await response.json();
+            if (url) {
+                window.location.href = url;
+            } else {
+                throw new Error('URL de checkout não recebida.');
+            }
+        } catch (error: any) {
+            toast({
+                variant: 'destructive',
+                title: 'Erro no Checkout',
+                description: error.message || 'Não foi possível redirecionar para o pagamento. Tente novamente.',
+            });
+            setIsLoading(false);
+        }
     }
 
     if (cartCount === 0) {
