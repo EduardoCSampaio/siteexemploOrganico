@@ -107,46 +107,74 @@ function RecentOrders({ orders, isLoading }: { orders: Order[] | null, isLoading
     )
 }
 
+function DashboardContent() {
+    const firestore = useFirestore();
+
+    const allOrdersQuery = useMemoFirebase(
+      () => (firestore ? query(collectionGroup(firestore, 'orders')) : null),
+      [firestore]
+    );
+    const { data: allOrders, isLoading: areOrdersLoading } = useCollection<Order>(allOrdersQuery);
+  
+    const recentOrdersQuery = useMemoFirebase(
+      () => (firestore ? query(collectionGroup(firestore, 'orders'), orderBy('orderDate', 'desc'), limit(5)) : null),
+      [firestore]
+    );
+    const { data: recentOrders, isLoading: areRecentOrdersLoading } = useCollection<Order>(recentOrdersQuery);
+  
+    const usersQuery = useMemoFirebase(
+      () => (firestore ? collection(firestore, 'users') : null),
+      [firestore]
+    );
+    const { data: users, isLoading: areUsersLoading } = useCollection(usersQuery);
+  
+    const totalRevenue = useMemo(() => {
+      if (!allOrders) return 0;
+      return allOrders.reduce((acc, order) => acc + order.totalAmount, 0);
+    }, [allOrders]);
+
+    const isLoadingStats = areOrdersLoading || areUsersLoading;
+
+    return (
+        <div className="space-y-6">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <StatCard 
+                    title="Receita Total"
+                    value={`R$ ${totalRevenue.toFixed(2).replace('.', ',')}`}
+                    icon={DollarSign}
+                    isLoading={isLoadingStats}
+                />
+                <StatCard 
+                    title="Pedidos"
+                    value={allOrders?.length ?? 0}
+                    icon={ShoppingCart}
+                    isLoading={isLoadingStats}
+                />
+                <StatCard 
+                    title="Clientes"
+                    value={users?.length ?? 0}
+                    icon={Users}
+                    isLoading={isLoadingStats}
+                />
+            </div>
+            <div>
+                <RecentOrders orders={recentOrders} isLoading={areRecentOrdersLoading} />
+            </div>
+        </div>
+    )
+}
+
 export default function AdminDashboardPage() {
   const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
-  const router = useRouter();
 
-  // 1. Check for admin role
   const adminRoleRef = useMemoFirebase(
     () => (firestore && user?.uid ? doc(firestore, 'roles_admin', user.uid) : null),
     [firestore, user?.uid]
   );
-  const { data: adminRole, isLoading: isAdminRoleLoading, error: adminRoleError } = useDoc(adminRoleRef);
+  const { data: adminRole, isLoading: isAdminRoleLoading } = useDoc(adminRoleRef);
   const isAdmin = adminRole !== null && adminRole !== undefined;
-
-  // 2. Conditionally prepare queries only if the user is an admin
-  const queriesReady = !isUserLoading && !isAdminRoleLoading && isAdmin;
-
-  const allOrdersQuery = useMemoFirebase(
-    () => (queriesReady ? query(collectionGroup(firestore, 'orders')) : null),
-    [queriesReady, firestore]
-  );
-  const { data: allOrders, isLoading: areOrdersLoading } = useCollection<Order>(allOrdersQuery);
-
-  const recentOrdersQuery = useMemoFirebase(
-    () => (queriesReady ? query(collectionGroup(firestore, 'orders'), orderBy('orderDate', 'desc'), limit(5)) : null),
-    [queriesReady, firestore]
-  );
-  const { data: recentOrders, isLoading: areRecentOrdersLoading } = useCollection<Order>(recentOrdersQuery);
-
-  const usersQuery = useMemoFirebase(
-    () => (queriesReady ? collection(firestore, 'users') : null),
-    [queriesReady, firestore]
-  );
-  const { data: users, isLoading: areUsersLoading } = useCollection(usersQuery);
-
-  const totalRevenue = useMemo(() => {
-    if (!allOrders) return 0;
-    return allOrders.reduce((acc, order) => acc + order.totalAmount, 0);
-  }, [allOrders]);
   
-  // Handle loading and non-admin states
   if (isUserLoading || isAdminRoleLoading) {
     return (
         <div className="flex items-center justify-center h-full">
@@ -158,7 +186,6 @@ export default function AdminDashboardPage() {
     );
   }
 
-  // After loading, if the user is not an admin, show an error message.
   if (!isAdmin) {
     return (
        <div className="flex items-center justify-center h-full">
@@ -172,34 +199,5 @@ export default function AdminDashboardPage() {
     );
   }
 
-
-  const isLoadingStats = areOrdersLoading || areUsersLoading;
-
-  return (
-    <div className="space-y-6">
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <StatCard 
-                title="Receita Total"
-                value={`R$ ${totalRevenue.toFixed(2).replace('.', ',')}`}
-                icon={DollarSign}
-                isLoading={isLoadingStats}
-            />
-            <StatCard 
-                title="Pedidos"
-                value={allOrders?.length ?? 0}
-                icon={ShoppingCart}
-                isLoading={isLoadingStats}
-            />
-            <StatCard 
-                title="Clientes"
-                value={users?.length ?? 0}
-                icon={Users}
-                isLoading={isLoadingStats}
-            />
-        </div>
-        <div>
-            <RecentOrders orders={recentOrders} isLoading={areRecentOrdersLoading} />
-        </div>
-    </div>
-  );
+  return <DashboardContent />;
 }
