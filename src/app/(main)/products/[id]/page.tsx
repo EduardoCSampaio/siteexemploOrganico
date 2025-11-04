@@ -67,7 +67,7 @@ function ProductDetailsSkeleton() {
 
 
 export default function ProductDetailsPage({ params }: { params: { id: string } }) {
-  const id = params.id;
+  const { id } = params;
   
   const firestore = useFirestore();
   const productRef = useMemoFirebase(
