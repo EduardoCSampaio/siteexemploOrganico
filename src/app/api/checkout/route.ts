@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       mode: 'payment',
       success_url: `${appUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/cancel`,
-      billing_address_collection: 'auto',
+      billing_address_collection: 'required', // Alterado de 'auto' para 'required' para suportar boleto
       tax_id_collection: {
         enabled: true,
       },
