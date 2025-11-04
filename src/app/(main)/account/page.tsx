@@ -45,6 +45,10 @@ function OrderItemCard({ orderId }: { orderId: string }) {
         return <div className="text-center text-xs p-4"><Loader2 className="h-4 w-4 animate-spin mx-auto"/></div>
     }
 
+    if (!items || items.length === 0) {
+        return <div className="text-center text-xs p-4 text-muted-foreground">Não foi possível carregar os itens deste pedido.</div>
+    }
+
     return (
         <div className="space-y-3">
             {items?.map(item => (
