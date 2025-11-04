@@ -12,7 +12,7 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 import { useFirestore, useUser } from '@/firebase';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -93,9 +93,8 @@ function ProductFormSkeleton() {
 }
 
 
-export default function ProductFormPage() {
-  const params = useParams();
-  const id = params.id as string;
+export default function ProductFormPage({ params }: { params: { id: string } }) {
+  const id = params.id;
   const isNew = id === 'new';
   const firestore = useFirestore();
   const router = useRouter();
@@ -123,7 +122,7 @@ export default function ProductFormPage() {
       return;
     }
 
-    if (!isNew && firestore) {
+    if (!isNew && firestore && id) {
       const fetchProduct = async () => {
         const docRef = doc(firestore, 'clothing_items', id);
         const docSnap = await getDoc(docRef);
