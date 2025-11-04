@@ -102,7 +102,7 @@ export function Header() {
         </Link>
         
         <div className="hidden md:flex mx-auto">
-            <Logo className="text-xl"/>
+            <Logo />
         </div>
 
         <nav className="ml-auto hidden lg:flex items-center space-x-4 text-xs">
