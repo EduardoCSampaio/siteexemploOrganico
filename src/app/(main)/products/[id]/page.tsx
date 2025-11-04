@@ -84,18 +84,17 @@ export default function ProductDetailsPage() {
   );
   const { data: product, isLoading } = useDoc<Product>(productRef);
 
+  // First, handle the loading state.
   if (isLoading) {
     return <ProductDetailsSkeleton />;
   }
 
-  if (!isLoading && !product) {
+  // After loading, if the product is not found, show the 404 page.
+  if (!product) {
     return notFound();
   }
-  
-  if (!product) {
-    return <ProductDetailsSkeleton />
-  }
 
+  // If loading is finished and product exists, render the details.
   return (
     <div className="container py-12">
       <Card>
