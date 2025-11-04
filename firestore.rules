@@ -31,7 +31,7 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return request.auth != null && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid))
+      return request.auth != null && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
     }
 
     /**
@@ -117,7 +117,7 @@ service cloud.firestore {
     match /roles_admin/{userId} {
       allow get: if isOwner(userId) || isAdmin();
       allow list: if isAdmin();
-      allow create: if request.auth.uid == userId || isAdmin();
+      allow create: if request.auth.uid == userId;
       allow update: if false;
       allow delete: if isAdmin();
     }
