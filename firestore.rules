@@ -107,7 +107,6 @@ service cloud.firestore {
         allow list: if isAdmin();
     }
 
-
     /**
      * @description: Grants admin privileges. A user can self-assign the admin role. Subsequent roles can be created by existing admins.
      * @path: /roles_admin/{userId}
@@ -116,7 +115,7 @@ service cloud.firestore {
      * @principle: Bootstraps the first admin and secures role management thereafter.
      */
     match /roles_admin/{userId} {
-      allow get: if isAdmin();
+      allow get: if isOwner(userId) || isAdmin();
       allow list: if isAdmin();
       allow create: if isOwner(userId) || isAdmin();
       allow update: if false;
