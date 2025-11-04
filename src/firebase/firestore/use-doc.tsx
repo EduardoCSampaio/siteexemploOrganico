@@ -19,7 +19,7 @@ type WithId<T> = T & { id: string };
  * @template T Type of the document data.
  */
 export interface UseDocResult<T> {
-  data: WithId<T> | null; // Document data with ID, or null.
+  data: WithId<T> | null | undefined; // Document data with ID, or null if not found, or undefined if loading.
   isLoading: boolean;       // True if loading.
   error: FirestoreError | Error | null; // Error object, or null.
 }
@@ -41,10 +41,10 @@ export interface UseDocResult<T> {
 export function useDoc<T = any>(
   memoizedDocRef: DocumentReference<DocumentData> | null | undefined,
 ): UseDocResult<T> {
-  type StateDataType = WithId<T> | null;
+  type StateDataType = WithId<T> | null | undefined;
 
-  const [data, setData] = useState<StateDataType>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [data, setData] = useState<StateDataType>(undefined);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<FirestoreError | Error | null>(null);
 
   useEffect(() => {
@@ -56,8 +56,8 @@ export function useDoc<T = any>(
     }
 
     setIsLoading(true);
+    setData(undefined);
     setError(null);
-    // Optional: setData(null); // Clear previous data instantly
 
     const unsubscribe = onSnapshot(
       memoizedDocRef,
@@ -68,7 +68,7 @@ export function useDoc<T = any>(
           // Document does not exist
           setData(null);
         }
-        setError(null); // Clear any previous error on successful snapshot (even if doc doesn't exist)
+        setError(null);
         setIsLoading(false);
       },
       (error: FirestoreError) => {
@@ -87,7 +87,7 @@ export function useDoc<T = any>(
     );
 
     return () => unsubscribe();
-  }, [memoizedDocRef]); // Re-run if the memoizedDocRef changes.
+  }, [memoizedDocRef]);
 
   return { data, isLoading, error };
 }

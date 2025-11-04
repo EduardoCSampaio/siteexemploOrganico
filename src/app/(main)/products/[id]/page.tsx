@@ -84,14 +84,14 @@ export default function ProductDetailsPage() {
   );
   const { data: product, isLoading } = useDoc<Product>(productRef);
 
-  // First, handle the loading state.
-  if (isLoading) {
+  // When loading (data is undefined), show the skeleton.
+  if (isLoading || product === undefined) {
     return <ProductDetailsSkeleton />;
   }
 
-  // After loading, if the product is not found, show the 404 page.
-  if (!product) {
-    return notFound();
+  // After loading, if the product is null, it was not found.
+  if (product === null) {
+    notFound();
   }
 
   // If loading is finished and product exists, render the details.
