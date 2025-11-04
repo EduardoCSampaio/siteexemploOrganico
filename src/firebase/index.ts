@@ -6,45 +6,23 @@ import { Auth, getAuth } from 'firebase/auth';
 import { Firestore, getFirestore } from 'firebase/firestore';
 
 let firebaseApp: FirebaseApp;
-let auth: Auth;
-let firestore: Firestore;
 
+// Direct initialization: Always use the config object.
+// This resolves the race condition where components would try to use Firebase
+// before the fallback initialization was complete.
 if (!getApps().length) {
-  try {
-    firebaseApp = initializeApp();
-  } catch (e) {
-    if (process.env.NODE_ENV === "production") {
-      console.warn('Automatic initialization failed. Falling back to firebase config object.', e);
-    }
-    firebaseApp = initializeApp(firebaseConfig);
-  }
+  firebaseApp = initializeApp(firebaseConfig);
 } else {
   firebaseApp = getApp();
 }
 
-auth = getAuth(firebaseApp);
-firestore = getFirestore(firebaseApp);
+const auth = getAuth(firebaseApp);
+const firestore = getFirestore(firebaseApp);
 
 // Export the initialized instances
 export { firebaseApp, auth, firestore };
 
-// IMPORTANT: DO NOT MODIFY THIS FUNCTION (it's no longer the primary init method)
-export function initializeFirebase() {
-  if (!getApps().length) {
-    let app;
-    try {
-      app = initializeApp();
-    } catch (e) {
-      if (process.env.NODE_ENV === "production") {
-        console.warn('Automatic initialization failed. Falling back to firebase config object.', e);
-      }
-      app = initializeApp(firebaseConfig);
-    }
-    return getSdks(app);
-  }
-  return getSdks(getApp());
-}
-
+// This function is kept for any potential legacy dependencies but is no longer the primary init method.
 export function getSdks(app: FirebaseApp) {
   return {
     firebaseApp: app,
@@ -52,7 +30,6 @@ export function getSdks(app: FirebaseApp) {
     firestore: getFirestore(app)
   };
 }
-
 
 export * from './provider';
 export * from './client-provider';
