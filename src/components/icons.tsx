@@ -8,16 +8,18 @@ export function Logo({ className }: { className?: string }) {
       suppressHydrationWarning={true}
     >
       {/* 
-        TODO: Substitua o 'src' abaixo pelo link da sua imagem de logo.
-        Recomenda-se usar uma imagem com fundo transparente (PNG).
-        Ajuste 'width' e 'height' se necessário.
+        INSTRUÇÃO: Para usar sua própria logo:
+        1. Crie uma pasta chamada 'public' na raiz do seu projeto (no mesmo nível de 'src').
+        2. Coloque seu arquivo de logo (ex: logo.png) dentro dessa pasta 'public'.
+        3. O código abaixo já está configurado para encontrar a imagem '/logo.png'.
+           Se o nome do seu arquivo for diferente, ajuste o 'src' abaixo.
       */}
       <Image
-        src="https://placehold.co/128x40/000000/FFFFFF/png?text=Organico."
+        src="/logo.png"
         alt="Organico Logo"
         fill
         className="object-contain"
-        unoptimized // Use esta propriedade se a sua logo for um SVG ou se você estiver usando um serviço que já otimiza a imagem.
+        unoptimized
       />
     </div>
   );
