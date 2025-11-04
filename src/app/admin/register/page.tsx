@@ -60,26 +60,29 @@ export default function AdminRegisterPage() {
 
       if (user && firestore) {
         const adminRoleRef = doc(firestore, 'roles_admin', user.uid);
-        
-        // This setDoc will be allowed by the new security rule
-        setDoc(adminRoleRef, {
-            username: user.email,
-            email: user.email,
-            id: user.uid
-        }).catch(error => {
-            const permissionError = new FirestorePermissionError({
-                path: adminRoleRef.path,
-                operation: 'create',
-                requestResourceData: { email: user.email, id: user.uid },
-            });
-            errorEmitter.emit('permission-error', permissionError);
-        });
+        const adminData = {
+          username: user.email,
+          email: user.email,
+          id: user.uid,
+        };
 
-        toast({
-          title: 'Administrador registrado com sucesso!',
-          description: 'Você agora pode fazer login.',
-        });
-        router.push('/admin/login');
+        // This setDoc will be allowed by the new security rule
+        setDoc(adminRoleRef, adminData)
+          .then(() => {
+            toast({
+              title: 'Administrador registrado com sucesso!',
+              description: 'Você agora pode fazer login.',
+            });
+            router.push('/admin/login');
+          })
+          .catch(error => {
+              const permissionError = new FirestorePermissionError({
+                  path: adminRoleRef.path,
+                  operation: 'create',
+                  requestResourceData: adminData,
+              });
+              errorEmitter.emit('permission-error', permissionError);
+          });
       }
 
     } catch (error: any) {
