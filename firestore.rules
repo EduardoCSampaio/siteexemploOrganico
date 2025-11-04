@@ -1,3 +1,4 @@
+
 /**
  * @file TrendSight Boutique Firestore Security Rules
  * @version 2
@@ -117,7 +118,7 @@ service cloud.firestore {
     match /roles_admin/{userId} {
       allow get: if isAdmin();
       allow list: if isAdmin();
-      allow create: if (isOwner(userId) && !exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid))) || isAdmin();
+      allow create: if (request.auth != null && size(get(/databases/$(database)/documents/roles_admin).data) == 0) || isAdmin();
       allow update: if false;
       allow delete: if isAdmin();
     }
