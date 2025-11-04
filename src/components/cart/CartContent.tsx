@@ -1,11 +1,12 @@
 
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
 import { useCart, CartItem } from '@/context/cart-context';
 import { Button } from '../ui/button';
 import { ScrollArea } from '../ui/scroll-area';
-import { Trash2, Plus, Minus, ShoppingCart } from 'lucide-react';
+import { Trash2, Plus, Minus, ShoppingCart, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
 function CartItemCard({ item }: { item: CartItem }) {
@@ -46,6 +47,17 @@ function CartItemCard({ item }: { item: CartItem }) {
 
 export function CartContent() {
     const { cartItems, subtotal, cartCount, clearCart } = useCart();
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleCheckout = async () => {
+        setIsLoading(true);
+        console.log("Iniciando checkout...");
+        // A lógica para criar a sessão de checkout do Stripe virá aqui.
+        // Por enquanto, apenas simulamos o carregamento.
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        console.log("Checkout finalizado (simulação).");
+        setIsLoading(false);
+    }
 
     if (cartCount === 0) {
         return (
@@ -75,7 +87,9 @@ export function CartContent() {
                     <span className="font-bold text-primary text-lg">R$ {subtotal.toFixed(2).replace('.', ',')}</span>
                 </div>
                 <p className="text-xs text-muted-foreground">Frete e impostos serão calculados no checkout.</p>
-                <Button className="w-full font-game text-sm">Finalizar Compra</Button>
+                <Button onClick={handleCheckout} disabled={isLoading} className="w-full font-game text-sm">
+                    {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Finalizar Compra'}
+                </Button>
                 <Button variant="outline" className="w-full text-xs" onClick={clearCart}>Limpar Carrinho</Button>
             </div>
         </div>
