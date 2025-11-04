@@ -44,22 +44,22 @@ service cloud.firestore {
     match /users/{userId} {
       allow get: if isOwner(userId);
       allow list: if false;
-      allow create: if isOwner(userId) && request.resource.data.id == userId;
-      allow update: if isOwner(userId) && resource != null && request.resource.data.id == resource.data.id;
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId) && resource != null;
       allow delete: if isOwner(userId) && resource != null;
     }
 
     /**
      * @description: Controls access to clothing items. Admins can create, update, and delete items. Public read access for catalog browsing.
      * @path: /clothing_items/{clothingItemId}
-     * @allow: Any user (get, list) can read clothing items.
-     * @allow: Admin (create, update, delete) can manage clothing items.
+     * @allow: Any user (read) can read clothing items.
+     * @allow: Admin (write) can manage clothing items.
      * @deny: Non-admin users cannot create, update, or delete clothing items.
      * @principle: Provides public read access while restricting write access to authorized administrators.
      */
     match /clothing_items/{clothingItemId} {
-      allow get, list: if true;
-      allow create, update, delete: if isAdmin();
+        allow read: if true;
+        allow write: if isAdmin();
     }
 
     /**
