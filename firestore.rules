@@ -117,9 +117,7 @@ service cloud.firestore {
     match /roles_admin/{userId} {
       allow get: if isAdmin();
       allow list: if isAdmin();
-      // Allow a user to create their own admin role IF the roles_admin collection is empty.
-      // After the first admin exists, only other admins can create new ones.
-      allow create: if (isOwner(userId) && get(/databases/$(database)/documents/roles_admin).size() == 0) || isAdmin();
+      allow create: if (isOwner(userId) && !exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid))) || isAdmin();
       allow update: if false;
       allow delete: if isAdmin();
     }
