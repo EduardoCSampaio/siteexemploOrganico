@@ -34,6 +34,15 @@ export async function POST(request: NextRequest) {
       mode: 'payment',
       success_url: `${appUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/cancel`,
+      billing_address_collection: 'auto',
+      tax_id_collection: {
+        enabled: true,
+      },
+      payment_method_options: {
+        boleto: {
+          expires_after_days: 3,
+        },
+      },
     });
 
     return NextResponse.json({ url: session.url });
