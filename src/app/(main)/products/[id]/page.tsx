@@ -28,32 +28,39 @@ function ProductDetailsSkeleton() {
         <CardContent className="pt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <Skeleton className="w-full aspect-[2/3]" />
+              <div className="bg-black border-2 border-primary/30 p-2">
+                <Skeleton className="w-full aspect-[2/3]" />
+              </div>
             </div>
             <div className="space-y-6 text-sm">
               <div className="space-y-2">
-                <Skeleton className="h-4 w-1/4" />
-                <Skeleton className="h-12 w-full" />
+                <h4 className="text-primary text-xs">DESCRIÇÃO</h4>
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-5/6" />
               </div>
+
               <div className="space-y-2">
-                <Skeleton className="h-4 w-1/4" />
+                <h4 className="text-primary text-xs">CORES</h4>
                 <div className="flex flex-wrap gap-2">
                   <Skeleton className="h-6 w-16" />
                   <Skeleton className="h-6 w-16" />
                 </div>
               </div>
+
               <div className="space-y-2">
-                <Skeleton className="h-4 w-1/4" />
+                <h4 className="text-primary text-xs">TAMANHOS</h4>
                 <div className="flex flex-wrap gap-2">
                   <Skeleton className="h-6 w-12" />
                   <Skeleton className="h-6 w-12" />
                   <Skeleton className="h-6 w-12" />
                 </div>
               </div>
+
               <div className="border-t-2 border-primary/30 pt-6 space-y-4">
                 <div className="flex justify-between items-center text-lg">
-                  <Skeleton className="h-6 w-1/4" />
-                  <Skeleton className="h-8 w-1/3" />
+                  <span className="text-muted-foreground text-xs">PREÇO:</span>
+                  <Skeleton className="h-6 w-24" />
                 </div>
                 <Skeleton className="h-10 w-full" />
               </div>
@@ -81,8 +88,12 @@ export default function ProductDetailsPage() {
     return <ProductDetailsSkeleton />;
   }
 
-  if (!product) {
+  if (!isLoading && !product) {
     return notFound();
+  }
+  
+  if (!product) {
+    return <ProductDetailsSkeleton />
   }
 
   return (
