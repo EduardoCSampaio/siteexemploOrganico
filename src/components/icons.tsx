@@ -4,7 +4,7 @@ import Image from "next/image";
 export function Logo({ className }: { className?: string }) {
   return (
     <div
-      className={cn("relative h-14 w-48", className)}
+      className={cn("relative h-14 w-64", className)}
       suppressHydrationWarning={true}
     >
       {/* 
