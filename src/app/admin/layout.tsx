@@ -27,6 +27,7 @@ export default function AdminLayout({
   const router = useRouter();
 
   useEffect(() => {
+    // Redireciona se, após o carregamento, não houver usuário.
     if (!isUserLoading && !user) {
       router.replace('/admin/login');
     }
@@ -39,18 +40,22 @@ export default function AdminLayout({
     });
   };
 
-  if (isUserLoading || !user) {
-     return (
-        <div className="flex min-h-screen items-center justify-center bg-background font-game relative">
-            <div className="absolute inset-0 scanlines z-0" />
-            <div className="text-center p-8 bg-black/50 border-2 border-primary/30 rounded-lg z-10">
-                <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
-                <p className="mt-4 text-sm text-muted-foreground">Verificando sessão de admin...</p>
-            </div>
+  const renderLoadingScreen = () => (
+     <div className="flex min-h-screen w-full items-center justify-center bg-background font-game relative">
+        <div className="absolute inset-0 scanlines z-0" />
+        <div className="text-center p-8 bg-black/50 border-2 border-primary/30 rounded-lg z-10">
+            <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
+            <p className="mt-4 text-sm text-muted-foreground">Verificando sessão de admin...</p>
         </div>
-    );
+    </div>
+  )
+
+  // Não renderiza nada do layout principal até que o usuário seja verificado.
+  if (isUserLoading || !user) {
+     return renderLoadingScreen();
   }
 
+  // Se o usuário estiver carregado e existir, renderiza o layout completo.
   return (
     <SidebarProvider>
       <Sidebar>
@@ -109,7 +114,10 @@ export default function AdminLayout({
             <SidebarTrigger className="md:hidden"/>
             <h1 className="text-xl font-semibold text-primary">Painel</h1>
         </header>
-        <main className="p-4">{children}</main>
+        <main className="p-4">
+            {/* O conteúdo da página (children) só será renderizado quando o usuário estiver carregado */}
+            {children}
+        </main>
         </SidebarInset>
     </SidebarProvider>
   );
