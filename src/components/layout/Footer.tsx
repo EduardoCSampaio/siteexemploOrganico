@@ -11,7 +11,7 @@ export function Footer() {
   return (
     <footer className="border-t border-primary/20 bg-black/50 text-xs">
       <div className="container py-8 text-center text-muted-foreground">
-          © {new Date().getFullYear()} Organico. NES Edition. Developed by Eduardo Campos
+          © {new Date().getFullYear()} Organico. Developed by Eduardo Campos
       </div>
     </footer>
   );
