@@ -5,6 +5,7 @@ import { Home } from "lucide-react";
 import { Logo } from "@/components/icons";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { CartWidget } from "../cart/CartWidget";
 
 const navLinks = [
   { href: "/products", label: "Roupas" },
@@ -21,17 +22,19 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-primary/20 bg-black/50 backdrop-blur-sm">
-      <div className="container flex h-16 items-center justify-between">
+      <div className="container flex h-16 items-center">
         <Link href="/" className="flex items-center gap-2 text-primary hover:text-white transition-colors">
           <Home className="h-5 w-5" />
           <span className="text-xs">Menu</span>
         </Link>
         
-        <div className="hidden md:flex">
-          <Logo className="text-xl"/>
+        <div className="ml-auto flex items-center gap-4">
+            <div className="hidden md:flex">
+              <Logo className="text-xl"/>
+            </div>
         </div>
 
-        <nav className="hidden md:flex items-center space-x-4 text-xs">
+        <nav className="ml-auto hidden md:flex items-center space-x-4 text-xs">
           {navLinks.map(link => (
              <Link
              key={link.href}
@@ -45,6 +48,9 @@ export function Header() {
            </Link>
           ))}
         </nav>
+        <div className="ml-4">
+            <CartWidget />
+        </div>
       </div>
     </header>
   );

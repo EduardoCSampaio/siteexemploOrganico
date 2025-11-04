@@ -16,6 +16,8 @@ import { useDoc, useFirestore } from '@/firebase';
 import { Product } from '@/lib/data';
 import { useMemoFirebase } from '@/firebase/provider';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useCart } from '@/context/cart-context';
+import { useToast } from '@/hooks/use-toast';
 
 function ProductDetailsSkeleton() {
   return (
@@ -76,6 +78,8 @@ function ProductDetailsSkeleton() {
 export default function ProductDetailsPage() {
   const params = useParams();
   const id = params.id as string;
+  const { addItem } = useCart();
+  const { toast } = useToast();
   
   const firestore = useFirestore();
   const productRef = useMemoFirebase(
@@ -83,6 +87,22 @@ export default function ProductDetailsPage() {
     [firestore, id]
   );
   const { data: product, isLoading } = useDoc<Product>(productRef);
+
+  const handleAddToCart = () => {
+    if (product) {
+        addItem({
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            image: product.image?.imageUrl ?? 'https://placehold.co/100x150',
+            quantity: 1,
+        });
+        toast({
+            title: "Item adicionado!",
+            description: `${product.name} foi adicionado ao seu carrinho.`,
+        });
+    }
+  }
 
   // When loading (data is undefined), show the skeleton.
   if (isLoading || product === undefined) {
@@ -153,7 +173,7 @@ export default function ProductDetailsPage() {
                     R$ {product.price.toFixed(2).replace('.', ',')}
                   </span>
                 </div>
-                <Button className="w-full font-game text-sm">
+                <Button onClick={handleAddToCart} className="w-full font-game text-sm">
                   Adicionar ao Carrinho
                 </Button>
               </div>
