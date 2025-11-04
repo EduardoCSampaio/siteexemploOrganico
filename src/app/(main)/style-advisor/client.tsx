@@ -18,6 +18,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
+import Link from 'next/link';
 
 const recommendationsSchema = z.object({
   userPreferences: z.string().min(10, "Descreva seu estilo com mais detalhes."),
@@ -151,7 +152,9 @@ export function StyleAdvisorClient() {
                          <span className="text-muted-foreground">PREÇO:</span>
                          <span className="font-bold text-primary">R$ {item.price.toFixed(2).replace('.', ',')}</span>
                       </div>
-                       <Button variant="outline" size="sm" className="w-full text-xs">Ver Item</Button>
+                       <Button variant="outline" size="sm" className="w-full text-xs" asChild>
+                          <Link href={`/products/${(item as any).id}`}>Ver Item</Link>
+                       </Button>
                     </div>
                   </Card>
                 ))}
