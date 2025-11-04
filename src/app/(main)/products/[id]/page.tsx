@@ -2,7 +2,7 @@
 
 import { doc } from 'firebase/firestore';
 import Image from 'next/image';
-import { notFound } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -66,15 +66,14 @@ function ProductDetailsSkeleton() {
 }
 
 
-export default function ProductDetailsPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default function ProductDetailsPage() {
+  const params = useParams();
+  const id = params.id as string;
+  
   const firestore = useFirestore();
   const productRef = useMemoFirebase(
-    () => (firestore ? doc(firestore, 'clothing_items', params.id) : null),
-    [firestore, params.id]
+    () => (firestore ? doc(firestore, 'clothing_items', id) : null),
+    [firestore, id]
   );
   const { data: product, isLoading } = useDoc<Product>(productRef);
 
