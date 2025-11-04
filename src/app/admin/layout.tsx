@@ -11,10 +11,11 @@ import {
   SidebarMenuButton,
   SidebarFooter,
 } from '@/components/ui/sidebar';
-import { LogOut, Shirt, LayoutDashboard, Home, ShoppingCart } from 'lucide-react';
+import { LogOut, Shirt, LayoutDashboard, Home, ShoppingCart, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import { useAuth } from '@/firebase';
+import { useAuth, useUser } from '@/firebase';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function AdminLayout({
   children,
@@ -22,13 +23,33 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const auth = useAuth();
+  const { user, isUserLoading } = useUser();
   const router = useRouter();
+
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.replace('/admin/login');
+    }
+  }, [user, isUserLoading, router]);
+
 
   const handleSignOut = () => {
     auth.signOut().then(() => {
       router.push('/admin/login');
     });
   };
+
+  if (isUserLoading || !user) {
+     return (
+        <div className="flex min-h-screen items-center justify-center bg-background font-game relative">
+            <div className="absolute inset-0 scanlines z-0" />
+            <div className="text-center p-8 bg-black/50 border-2 border-primary/30 rounded-lg z-10">
+                <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
+                <p className="mt-4 text-sm text-muted-foreground">Verificando sessão de admin...</p>
+            </div>
+        </div>
+    );
+  }
 
   return (
     <SidebarProvider>
