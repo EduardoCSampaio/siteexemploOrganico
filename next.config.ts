@@ -39,6 +39,12 @@ const nextConfig: NextConfig = {
         hostname: 'down-br.img.susercontent.com',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.eurobabykids.com.br',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
