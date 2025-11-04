@@ -119,21 +119,23 @@ export default function AdminDashboardPage() {
     }
   }, [user, isUserLoading, router]);
 
+  const queriesReady = !!firestore && !!user;
+
   const allOrdersQuery = useMemoFirebase(
-    () => (firestore ? query(collectionGroup(firestore, 'orders')) : null),
-    [firestore]
+    () => (queriesReady ? query(collectionGroup(firestore, 'orders')) : null),
+    [queriesReady, firestore]
   );
   const { data: allOrders, isLoading: areOrdersLoading } = useCollection<Order>(allOrdersQuery);
 
   const recentOrdersQuery = useMemoFirebase(
-    () => (firestore ? query(collectionGroup(firestore, 'orders'), orderBy('orderDate', 'desc'), limit(5)) : null),
-    [firestore]
+    () => (queriesReady ? query(collectionGroup(firestore, 'orders'), orderBy('orderDate', 'desc'), limit(5)) : null),
+    [queriesReady, firestore]
   );
   const { data: recentOrders, isLoading: areRecentOrdersLoading } = useCollection<Order>(recentOrdersQuery);
 
   const usersQuery = useMemoFirebase(
-    () => (firestore ? collection(firestore, 'users') : null),
-    [firestore]
+    () => (queriesReady ? collection(firestore, 'users') : null),
+    [queriesReady, firestore]
   );
   const { data: users, isLoading: areUsersLoading } = useCollection(usersQuery);
 
