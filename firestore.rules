@@ -30,7 +30,7 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return request.auth != null && get(/databases/$(database)/documents/roles_admin/$(request.auth.uid)).data != null;
+      return request.auth != null && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
     }
 
     /**
@@ -104,16 +104,16 @@ service cloud.firestore {
     }
 
     /**
-     * @description: Grants admin privileges. Allows creation of the first admin, then restricts creation to other admins.
+     * @description: Grants admin privileges. The first user can self-assign the admin role. Subsequent admin roles can only be created by existing admins.
      * @path: /roles_admin/{userId}
-     * @allow: User can create their admin role if their uid matches the document id.
-     * @allow: Admin can create/delete other admin roles.
-     * @principle: Uses document existence for permissions.
+     * @allow: A user can create their own admin role document if no other admins exist.
+     * @allow: An existing admin can create or delete other admin roles.
+     * @principle: Bootstraps the first admin and secures role management thereafter.
      */
     match /roles_admin/{userId} {
       allow get: if isAdmin();
-      allow list: if isAdmin(); // Allow admins to list other admins
-      allow create: if request.auth.uid == userId;
+      allow list: if isAdmin();
+      allow create: if (request.auth.uid == userId && !exists(/databases/$(database)/documents/roles_admin)) || isAdmin();
       allow update: if false;
       allow delete: if isAdmin();
     }
