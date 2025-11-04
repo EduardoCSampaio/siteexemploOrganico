@@ -1,15 +1,16 @@
 'use client';
-import { useUser, useFirestore, useCollection } from '@/firebase';
+import { useUser, useFirestore, useCollection, useDoc } from '@/firebase';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import { collection } from 'firebase/firestore';
+import { useEffect, useMemo } from 'react';
+import { collection, doc } from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Loader2, Package, FileText } from 'lucide-react';
+import { Loader2, Package, FileText, User as UserIcon } from 'lucide-react';
 import { AnimatedHeader } from '@/components/AnimatedHeader';
 import { useMemoFirebase } from '@/firebase/provider';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { format } from 'date-fns';
 import Image from 'next/image';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface OrderItem {
   id: string;
@@ -29,6 +30,13 @@ interface Order {
   status: string;
   items?: OrderItem[]; // Será preenchido separadamente
 }
+
+interface UserProfile {
+    firstName: string;
+    lastName: string;
+    email: string;
+}
+
 
 function OrderItemCard({ orderId }: { orderId: string }) {
     const { user } = useUser();
@@ -61,6 +69,49 @@ function OrderItemCard({ orderId }: { orderId: string }) {
                     <p className="text-xs font-bold">R$ {(item.price * item.quantity).toFixed(2).replace('.', ',')}</p>
                 </div>
             ))}
+        </div>
+    );
+}
+
+function ProfileCardContent() {
+    const { user } = useUser();
+    const firestore = useFirestore();
+
+    const userProfileRef = useMemoFirebase(() => {
+        if (!firestore || !user?.uid) return null;
+        return doc(firestore, 'users', user.uid);
+    }, [firestore, user?.uid]);
+
+    const { data: userProfile, isLoading } = useDoc<UserProfile>(userProfileRef);
+
+    if (isLoading) {
+        return (
+            <div className="space-y-4">
+                <div className="space-y-2">
+                    <Skeleton className="h-4 w-12" />
+                    <Skeleton className="h-5 w-3/4" />
+                </div>
+                 <div className="space-y-2">
+                    <Skeleton className="h-4 w-12" />
+                    <Skeleton className="h-5 w-4/5" />
+                </div>
+            </div>
+        )
+    }
+
+    const displayName = userProfile ? `${userProfile.firstName} ${userProfile.lastName}` : (user?.displayName || 'Não informado');
+    const displayEmail = userProfile ? userProfile.email : (user?.email || 'Não informado');
+
+    return (
+        <div className="space-y-3">
+             <div className="flex flex-col">
+                <span className="font-bold text-primary text-xs">Nome:</span> 
+                <span className="text-muted-foreground text-sm">{displayName}</span>
+            </div>
+             <div className="flex flex-col">
+                <span className="font-bold text-primary text-xs">Email:</span> 
+                <span className="text-muted-foreground text-sm">{displayEmail}</span>
+            </div>
         </div>
     );
 }
@@ -100,19 +151,18 @@ export default function AccountPage() {
         <div className="text-center mb-12">
             <AnimatedHeader text="Minha Conta" />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="md:col-span-1">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            <div className="lg:col-span-1">
                 <Card>
                     <CardHeader>
-                        <CardTitle>Perfil</CardTitle>
+                        <CardTitle className="flex items-center gap-2"><UserIcon className="h-5 w-5" /> Perfil</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-2 text-sm pt-4">
-                        <p className="text-muted-foreground"><span className="font-bold text-primary">Nome:</span> {user.displayName || 'Não informado'}</p>
-                        <p className="text-muted-foreground"><span className="font-bold text-primary">Email:</span> {user.email}</p>
+                        <ProfileCardContent />
                     </CardContent>
                 </Card>
             </div>
-            <div className="md:col-span-2">
+            <div className="lg:col-span-2">
                  <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2"><FileText className="h-5 w-5"/> Histórico de Pedidos</CardTitle>

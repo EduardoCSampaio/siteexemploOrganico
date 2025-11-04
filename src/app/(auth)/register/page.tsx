@@ -23,7 +23,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth, useFirestore } from '@/firebase';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -64,7 +64,13 @@ export default function RegisterPage() {
       const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
       const user = userCredential.user;
 
-      if (user && firestore) {
+      // Update Firebase Auth profile displayName
+      await updateProfile(user, {
+        displayName: `${data.firstName} ${data.lastName}`
+      });
+
+      // Save user data to Firestore
+      if (firestore) {
         const userRef = doc(firestore, 'users', user.uid);
         const userData = {
             id: user.uid,
@@ -74,6 +80,7 @@ export default function RegisterPage() {
             createdAt: serverTimestamp()
         };
 
+        // Use non-blocking write for better UX, error handled globally
         setDoc(userRef, userData).catch(error => {
             const permissionError = new FirestorePermissionError({
                 path: userRef.path,
@@ -81,6 +88,12 @@ export default function RegisterPage() {
                 requestResourceData: userData,
             });
             errorEmitter.emit('permission-error', permissionError);
+             // Also show a toast as fallback
+            toast({
+                variant: 'destructive',
+                title: 'Erro ao salvar perfil',
+                description: 'Não foi possível salvar seus dados. Tente fazer login.',
+            });
         });
 
         toast({
