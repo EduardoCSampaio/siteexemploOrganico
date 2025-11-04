@@ -1,12 +1,11 @@
-
 'use client';
-import { useUser, useFirestore, useCollection } from '@/firebase';
+import { useUser, useFirestore, useCollection, useDoc } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Loader2, DollarSign, ShoppingCart, Users, Package } from 'lucide-react';
+import { Loader2, DollarSign, ShoppingCart, Users, Package, ShieldAlert } from 'lucide-react';
 import { useMemoFirebase } from '@/firebase/provider';
-import { collection, query, limit, orderBy, collectionGroup } from 'firebase/firestore';
+import { collection, query, limit, orderBy, collectionGroup, doc } from 'firebase/firestore';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
@@ -113,7 +112,16 @@ export default function AdminDashboardPage() {
   const firestore = useFirestore();
   const router = useRouter();
 
-  const queriesReady = !!firestore && !!user && !isUserLoading;
+  // 1. Check for admin role
+  const adminRoleRef = useMemoFirebase(
+    () => (firestore && user?.uid ? doc(firestore, 'roles_admin', user.uid) : null),
+    [firestore, user?.uid]
+  );
+  const { data: adminRole, isLoading: isAdminRoleLoading, error: adminRoleError } = useDoc(adminRoleRef);
+  const isAdmin = adminRole !== null && adminRole !== undefined;
+
+  // 2. Conditionally prepare queries only if the user is an admin
+  const queriesReady = !isUserLoading && !isAdminRoleLoading && isAdmin;
 
   const allOrdersQuery = useMemoFirebase(
     () => (queriesReady ? query(collectionGroup(firestore, 'orders')) : null),
@@ -137,17 +145,33 @@ export default function AdminDashboardPage() {
     if (!allOrders) return 0;
     return allOrders.reduce((acc, order) => acc + order.totalAmount, 0);
   }, [allOrders]);
-
-  if (isUserLoading || !user) {
+  
+  // Handle loading and non-admin states
+  if (isUserLoading || isAdminRoleLoading) {
     return (
         <div className="flex items-center justify-center h-full">
             <div className="text-center p-8 bg-black/50 border-2 border-primary/30 rounded-lg">
                 <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
-                <p className="mt-4 text-sm text-muted-foreground">Verificando sessão...</p>
+                <p className="mt-4 text-sm text-muted-foreground">Verificando permissões...</p>
             </div>
         </div>
     );
   }
+
+  // After loading, if the user is not an admin, show an error message.
+  if (!isAdmin) {
+    return (
+       <div className="flex items-center justify-center h-full">
+            <div className="text-center p-8 bg-black/50 border-2 border-destructive/50 rounded-lg">
+                <ShieldAlert className="mx-auto h-12 w-12 text-destructive" />
+                <h3 className="mt-4 text-lg font-bold text-destructive">Acesso Negado</h3>
+                <p className="mt-2 text-sm text-muted-foreground">Você não tem permissão para acessar o dashboard.</p>
+                <p className="mt-1 text-xs text-muted-foreground">Se você deveria ser um admin, tente usar a página de promoção.</p>
+            </div>
+        </div>
+    );
+  }
+
 
   const isLoadingStats = areOrdersLoading || areUsersLoading;
 
