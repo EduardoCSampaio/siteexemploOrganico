@@ -58,8 +58,6 @@ export function useDoc<T = any>(
 
     // Reference is available, start the snapshot listener.
     setIsLoading(true);
-    setData(undefined);
-    setError(null);
 
     const unsubscribe = onSnapshot(
       memoizedDocRef,

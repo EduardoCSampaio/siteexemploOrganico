@@ -104,8 +104,7 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
   return (
     <FirebaseContext.Provider value={contextValue}>
       <FirebaseErrorListener />
-      {/* Do not render children until the initial user loading is complete */}
-      {!userAuthState.isUserLoading && children}
+      {children}
     </FirebaseContext.Provider>
   );
 };
