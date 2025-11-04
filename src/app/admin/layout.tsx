@@ -11,7 +11,7 @@ import {
   SidebarMenuButton,
   SidebarFooter,
 } from '@/components/ui/sidebar';
-import { LogOut, Shirt, LayoutDashboard, Home } from 'lucide-react';
+import { LogOut, Shirt, LayoutDashboard, Home, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/firebase';
 import { useRouter } from 'next/navigation';
@@ -51,6 +51,14 @@ export default function AdminLayout({
                 <Link href="/admin/products">
                   <Shirt />
                   Produtos
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+             <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link href="/admin/orders">
+                  <ShoppingCart />
+                  Pedidos
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

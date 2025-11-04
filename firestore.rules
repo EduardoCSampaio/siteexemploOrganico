@@ -87,21 +87,25 @@ service cloud.firestore {
       allow get, list: if isOwner(userId) || isAdmin();
       allow create: if isOwner(userId);
       allow update, delete: if (isOwner(userId) && resource != null) || isAdmin();
+
+       /**
+       * @description: Allows admins to list all orders across all users.
+       * @path: /orders/{orderId} (collection group)
+       * @allow: Admin (list) can list all orders.
+       * @deny: Non-admin users cannot list all orders.
+       * @principle: Enables admin-level order management.
+       */
+      match /order_items/{orderItemId} {
+        allow get, list: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId);
+        allow update, delete: if (isOwner(userId) && resource != null) || isAdmin();
+      }
+    }
+    
+    match /{path=**}/orders/{orderId} {
+        allow list: if isAdmin();
     }
 
-    /**
-     * @description: Protects order items. Only the user with the matching userId can read/write their order items. Admins can also access all order items.
-     * @path: /users/{userId}/orders/{orderId}/order_items/{orderItemId}
-     * @allow: User (get, list, create, update, delete) can manage their own order items if the userId matches their auth.uid.
-     * @allow: Admin (get, list, create, update, delete) can manage all order items.
-     * @deny: User cannot access another user's order items.
-     * @principle: Enforces document ownership and allows admin override for managing order items.
-     */
-    match /users/{userId}/orders/{orderId}/order_items/{orderItemId} {
-      allow get, list: if isOwner(userId) || isAdmin();
-      allow create: if isOwner(userId);
-      allow update, delete: if (isOwner(userId) && resource != null) || isAdmin();
-    }
 
     /**
      * @description: Grants admin privileges. The first user can self-assign the admin role. Subsequent admin roles can only be created by existing admins.
