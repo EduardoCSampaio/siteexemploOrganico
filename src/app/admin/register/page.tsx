@@ -66,7 +66,7 @@ export default function AdminRegisterPage() {
           id: user.uid,
         };
 
-        // This setDoc will be allowed by the new security rule
+        // Non-blocking write. Error is handled globally.
         setDoc(adminRoleRef, adminData)
           .then(() => {
             toast({
@@ -76,12 +76,21 @@ export default function AdminRegisterPage() {
             router.push('/admin/login');
           })
           .catch(error => {
+              // Even with the non-blocking approach, we create a detailed error
+              // for debugging, which will be caught by the FirebaseErrorListener.
               const permissionError = new FirestorePermissionError({
                   path: adminRoleRef.path,
                   operation: 'create',
                   requestResourceData: adminData,
               });
               errorEmitter.emit('permission-error', permissionError);
+              
+              // Also show a user-facing toast as a fallback.
+              toast({
+                variant: 'destructive',
+                title: 'Erro de Permissão',
+                description: 'Não foi possível atribuir a função de administrador. Verifique as regras de segurança do Firestore.',
+              });
           });
       }
 
