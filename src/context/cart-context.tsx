@@ -4,11 +4,15 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 export interface CartItem {
-    id: string;
+    id: string; // ID do produto base
     name: string;
     price: number;
     image: string;
     quantity: number;
+    size: string | null;
+    color: string | null;
+    // O ID único do item no carrinho, combinando produto, tamanho e cor
+    cartItemId?: string; 
 }
 
 interface CartContextType {
@@ -16,8 +20,8 @@ interface CartContextType {
     isCartOpen: boolean;
     toggleCart: () => void;
     addItem: (item: CartItem) => void;
-    removeItem: (itemId: string) => void;
-    updateItemQuantity: (itemId: string, quantity: number) => void;
+    removeItem: (cartItemId: string) => void;
+    updateItemQuantity: (cartItemId: string, quantity: number) => void;
     clearCart: () => void;
     cartCount: number;
     subtotal: number;
@@ -40,28 +44,34 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     const toggleCart = () => setIsCartOpen(!isCartOpen);
 
     const addItem = (item: CartItem) => {
+        // Cria um ID único para a variante do item (produto + cor + tamanho)
+        const cartItemId = `${item.id}-${item.color || ''}-${item.size || ''}`;
+
         setCartItems(prevItems => {
-            const existingItem = prevItems.find(i => i.id === item.id);
+            const existingItem = prevItems.find(i => i.cartItemId === cartItemId);
+            
             if (existingItem) {
+                // Se o item já existe, apenas aumenta a quantidade
                 return prevItems.map(i =>
-                    i.id === item.id ? { ...i, quantity: i.quantity + item.quantity } : i
+                    i.cartItemId === cartItemId ? { ...i, quantity: i.quantity + item.quantity } : i
                 );
             }
-            return [...prevItems, item];
+            // Se for um novo item (ou nova variante), adiciona ao carrinho
+            return [...prevItems, { ...item, cartItemId }];
         });
         setIsCartOpen(true);
     };
 
-    const removeItem = (itemId: string) => {
-        setCartItems(prevItems => prevItems.filter(i => i.id !== itemId));
+    const removeItem = (cartItemId: string) => {
+        setCartItems(prevItems => prevItems.filter(i => i.cartItemId !== cartItemId));
     };
 
-    const updateItemQuantity = (itemId: string, quantity: number) => {
+    const updateItemQuantity = (cartItemId: string, quantity: number) => {
         if (quantity <= 0) {
-            removeItem(itemId);
+            removeItem(cartItemId);
         } else {
             setCartItems(prevItems =>
-                prevItems.map(i => (i.id === itemId ? { ...i, quantity } : i))
+                prevItems.map(i => (i.cartItemId === cartItemId ? { ...i, quantity } : i))
             );
         }
     };

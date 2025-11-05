@@ -20,6 +20,7 @@ import { useCart } from '@/context/cart-context';
 import { useToast } from '@/hooks/use-toast';
 import { Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useState } from 'react';
 
 function FavoriteButton({ productId }: { productId: string }) {
     const { user } = useUser();
@@ -71,11 +72,11 @@ function ProductDetailsSkeleton() {
   return (
     <div className="container py-12">
       <Card>
-        <CardHeader>
+        <CardHeader className="p-4 md:p-6">
           <Skeleton className="h-8 w-3/4" />
           <Skeleton className="h-4 w-1/4" />
         </CardHeader>
-        <CardContent className="pt-4">
+        <CardContent className="p-4 md:p-6 pt-0">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <div className="bg-black border-2 border-primary/30 p-2">
@@ -93,17 +94,17 @@ function ProductDetailsSkeleton() {
               <div className="space-y-2">
                 <h4 className="text-primary text-xs">CORES</h4>
                 <div className="flex flex-wrap gap-2">
-                  <Skeleton className="h-6 w-16" />
-                  <Skeleton className="h-6 w-16" />
+                  <Skeleton className="h-8 w-16" />
+                  <Skeleton className="h-8 w-16" />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <h4 className="text-primary text-xs">TAMANHOS</h4>
                 <div className="flex flex-wrap gap-2">
-                  <Skeleton className="h-6 w-12" />
-                  <Skeleton className="h-6 w-12" />
-                  <Skeleton className="h-6 w-12" />
+                  <Skeleton className="h-8 w-12" />
+                  <Skeleton className="h-8 w-12" />
+                  <Skeleton className="h-8 w-12" />
                 </div>
               </div>
 
@@ -130,6 +131,9 @@ export default function ProductDetailsPage() {
   const { addItem } = useCart();
   const { toast } = useToast();
   
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+
   const firestore = useFirestore();
   const productRef = useMemoFirebase(
     () => (firestore && id ? doc(firestore, 'clothing_items', id) : null),
@@ -137,18 +141,31 @@ export default function ProductDetailsPage() {
   );
   const { data: product, isLoading } = useDoc<Product>(productRef);
 
+  const hasSizes = product && product.sizes && product.sizes.length > 0;
+  const hasColors = product && product.colors && product.colors.length > 0;
+
+  const canAddToCart = (!hasSizes || !!selectedSize) && (!hasColors || !!selectedColor);
+
   const handleAddToCart = () => {
-    if (product) {
+    if (product && canAddToCart) {
         addItem({
             id: product.id,
             name: product.name,
             price: product.price,
             image: product.image?.imageUrl ?? 'https://placehold.co/100x150',
             quantity: 1,
+            size: selectedSize,
+            color: selectedColor,
         });
         toast({
             title: "Item adicionado!",
             description: `${product.name} foi adicionado ao seu carrinho.`,
+        });
+    } else {
+        toast({
+            variant: "destructive",
+            title: "Seleção necessária",
+            description: "Por favor, selecione tamanho e cor.",
         });
     }
   }
@@ -167,11 +184,11 @@ export default function ProductDetailsPage() {
   return (
     <div className="container py-12">
       <Card>
-        <CardHeader>
+        <CardHeader className="p-4 md:p-6">
           <CardTitle className="text-xl">{product.name}</CardTitle>
           <CardDescription>{product.category}</CardDescription>
         </CardHeader>
-        <CardContent className="pt-4">
+        <CardContent className="p-4 md:p-6 pt-0">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <div className="bg-black border-2 border-primary/30 p-2">
@@ -193,27 +210,43 @@ export default function ProductDetailsPage() {
                 </p>
               </div>
 
-              <div className="space-y-2">
-                <h4 className="text-primary text-xs">CORES</h4>
-                <div className="flex flex-wrap gap-2">
-                  {product.colors?.map((color) => (
-                    <Badge variant="secondary" key={color} className="text-xs">
-                      {color}
-                    </Badge>
-                  ))}
+              {hasColors && (
+                <div className="space-y-2">
+                    <h4 className="text-primary text-xs">CORES</h4>
+                    <div className="flex flex-wrap gap-2">
+                    {product.colors?.map((color) => (
+                        <Button
+                            key={color}
+                            variant={selectedColor === color ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setSelectedColor(color)}
+                            className="text-xs"
+                        >
+                            {color}
+                        </Button>
+                    ))}
+                    </div>
                 </div>
-              </div>
+              )}
 
-              <div className="space-y-2">
-                <h4 className="text-primary text-xs">TAMANHOS</h4>
-                <div className="flex flex-wrap gap-2">
-                  {product.sizes?.map((size) => (
-                    <Badge variant="secondary" key={size} className="text-xs">
-                      {size}
-                    </Badge>
-                  ))}
+              {hasSizes && (
+                <div className="space-y-2">
+                    <h4 className="text-primary text-xs">TAMANHOS</h4>
+                    <div className="flex flex-wrap gap-2">
+                    {product.sizes?.map((size) => (
+                        <Button
+                            key={size}
+                            variant={selectedSize === size ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setSelectedSize(size)}
+                            className="text-xs w-12"
+                        >
+                            {size}
+                        </Button>
+                    ))}
+                    </div>
                 </div>
-              </div>
+              )}
 
               <div className="border-t-2 border-primary/30 pt-6 space-y-4">
                 <div className="flex justify-between items-center text-lg">
@@ -222,7 +255,7 @@ export default function ProductDetailsPage() {
                     R$ {product.price.toFixed(2).replace('.', ',')}
                   </span>
                 </div>
-                <Button onClick={handleAddToCart} className="w-full font-game text-sm">
+                <Button onClick={handleAddToCart} disabled={!canAddToCart} className="w-full font-game text-sm">
                   Adicionar ao Carrinho
                 </Button>
                 <FavoriteButton productId={product.id} />

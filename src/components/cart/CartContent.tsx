@@ -12,6 +12,8 @@ import { useToast } from '@/hooks/use-toast';
 
 function CartItemCard({ item }: { item: CartItem }) {
     const { updateItemQuantity, removeItem } = useCart();
+    
+    if (!item.cartItemId) return null; // Safety check
 
     return (
         <div className="flex items-start gap-4 py-4">
@@ -25,20 +27,25 @@ function CartItemCard({ item }: { item: CartItem }) {
             </div>
             <div className="flex-grow">
                 <h4 className="text-sm font-semibold text-primary">{item.name}</h4>
-                <p className="text-xs text-muted-foreground">Preço: R$ {item.price.toFixed(2).replace('.', ',')}</p>
+                 {(item.size || item.color) && (
+                    <p className="text-xs text-muted-foreground">
+                        {item.color}{item.size && item.color && ' / '}{item.size}
+                    </p>
+                )}
+                <p className="text-xs text-muted-foreground mt-1">Preço: R$ {item.price.toFixed(2).replace('.', ',')}</p>
                 <div className="flex items-center gap-2 mt-2">
-                    <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => updateItemQuantity(item.id, item.quantity - 1)}>
+                    <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => updateItemQuantity(item.cartItemId!, item.quantity - 1)}>
                         <Minus className="h-3 w-3" />
                     </Button>
                     <span className="text-sm font-bold w-4 text-center">{item.quantity}</span>
-                    <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => updateItemQuantity(item.id, item.quantity + 1)}>
+                    <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => updateItemQuantity(item.cartItemId!, item.quantity + 1)}>
                         <Plus className="h-3 w-3" />
                     </Button>
                 </div>
             </div>
             <div className="flex flex-col items-end gap-2">
                 <p className="text-sm font-bold text-primary">R$ {(item.price * item.quantity).toFixed(2).replace('.', ',')}</p>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => removeItem(item.id)}>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => removeItem(item.cartItemId!)}>
                     <Trash2 className="h-4 w-4" />
                 </Button>
             </div>
@@ -100,7 +107,7 @@ export function CartContent() {
             <ScrollArea className="flex-grow pr-6 -mr-6">
                 <div className="divide-y divide-primary/30">
                     {cartItems.map(item => (
-                        <CartItemCard key={item.id} item={item} />
+                        <CartItemCard key={item.cartItemId} item={item} />
                     ))}
                 </div>
             </ScrollArea>
