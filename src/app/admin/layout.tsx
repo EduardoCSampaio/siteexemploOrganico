@@ -15,7 +15,7 @@ import { LogOut, Shirt, LayoutDashboard, Home, ShoppingCart, Loader2, ShieldAler
 import Link from 'next/link';
 import { useAuth, useUser, useFirestore, useDoc } from '@/firebase';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { doc } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
 
@@ -29,18 +29,22 @@ function AdminGate({ children }: { children: React.ReactNode; }) {
     () => (firestore && user?.uid ? doc(firestore, 'roles_admin', user.uid) : null),
     [firestore, user?.uid]
   );
+  
+  // useDoc returns `undefined` while loading, `null` if not found, and data if found.
   const { data: adminRole, isLoading: isAdminRoleLoading } = useDoc(adminRoleRef);
   
-  const isAdmin = adminRole !== null && adminRole !== undefined;
+  const isLoading = isUserLoading || isAdminRoleLoading;
+
+  // isAdmin is only true if the document explicitly exists.
+  const isAdmin = !!adminRole;
 
   useEffect(() => {
-    if (!isUserLoading && !user) {
+    // If loading is done and there's no user, redirect to login.
+    if (!isLoading && !user) {
       router.replace('/admin/login');
     }
-  }, [user, isUserLoading, router]);
+  }, [user, isLoading, router]);
 
-  const isLoading = isUserLoading || isAdminRoleLoading;
-  
   if (isLoading) {
     return (
       <div className="flex min-h-screen w-full items-center justify-center bg-background font-game relative">
@@ -53,6 +57,7 @@ function AdminGate({ children }: { children: React.ReactNode; }) {
     );
   }
 
+  // After loading, if the user is not an admin, deny access.
   if (!isAdmin) {
      return (
        <div className="flex min-h-screen w-full items-center justify-center bg-background font-game relative">
@@ -67,6 +72,7 @@ function AdminGate({ children }: { children: React.ReactNode; }) {
     );
   }
 
+  // If loading is complete and user is an admin, render the children.
   return <>{children}</>;
 }
 
@@ -86,13 +92,13 @@ export default function AdminLayout({
     });
   };
 
-  // Se estiver na página de login, não renderize o layout do admin,
-  // pois isso criaria um loop de verificação.
-  if (pathname === '/admin/login') {
+  // If on the login page, don't render the admin layout,
+  // as this would create a check loop.
+  if (pathname === '/admin/login' || pathname === '/admin/register' || pathname === '/admin/promote') {
     return <>{children}</>;
   }
 
-  // O AdminGate agora controla o acesso e a tela de carregamento.
+  // AdminGate now controls access and the loading screen.
   return (
     <AdminGate>
       <SidebarProvider>
