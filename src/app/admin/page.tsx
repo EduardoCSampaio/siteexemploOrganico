@@ -110,19 +110,19 @@ function DashboardContent() {
     const firestore = useFirestore();
 
     const allOrdersQuery = useMemoFirebase(
-      () => (firestore ? query(collectionGroup(firestore, 'orders')) : null),
+      () => query(collectionGroup(firestore, 'orders')),
       [firestore]
     );
     const { data: allOrders, isLoading: areOrdersLoading } = useCollection<Order>(allOrdersQuery);
   
     const recentOrdersQuery = useMemoFirebase(
-      () => (firestore ? query(collectionGroup(firestore, 'orders'), orderBy('orderDate', 'desc'), limit(5)) : null),
+      () => query(collectionGroup(firestore, 'orders'), orderBy('orderDate', 'desc'), limit(5)),
       [firestore]
     );
     const { data: recentOrders, isLoading: areRecentOrdersLoading } = useCollection<Order>(recentOrdersQuery);
   
     const usersQuery = useMemoFirebase(
-      () => (firestore ? collection(firestore, 'users') : null),
+      () => collection(firestore, 'users'),
       [firestore]
     );
     const { data: users, isLoading: areUsersLoading } = useCollection(usersQuery);
@@ -175,7 +175,7 @@ export default function AdminDashboardPage() {
   
   const isAdmin = adminRole !== null && adminRole !== undefined;
 
-  if (isUserLoading || isAdminRoleLoading) {
+  if (isUserLoading || isAdminRoleLoading || !firestore) {
     return (
         <div className="flex items-center justify-center h-full">
             <div className="text-center p-8 bg-black/50 border-2 border-primary/30 rounded-lg">
