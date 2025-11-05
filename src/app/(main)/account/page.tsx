@@ -1,7 +1,7 @@
 'use client';
 import { useUser, useFirestore, useCollection, useDoc } from '@/firebase';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { collection, doc } from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Loader2, Package, FileText, User as UserIcon } from 'lucide-react';
@@ -12,6 +12,7 @@ import { format } from 'date-fns';
 import Image from 'next/image';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 interface OrderItem {
   id: string;
@@ -53,29 +54,15 @@ const statusColors: { [key: string]: string } = {
 };
 
 
-function OrderItemCard({ orderId }: { orderId: string }) {
-    const { user } = useUser();
-    const firestore = useFirestore();
-
-    const orderItemsQuery = useMemoFirebase(() => {
-        if (!firestore || !user?.uid || !orderId) return null;
-        return collection(firestore, `users/${user.uid}/orders/${orderId}/order_items`);
-    }, [firestore, user?.uid, orderId]);
-    
-    const { data: items, isLoading } = useCollection<OrderItem>(orderItemsQuery);
-
-    if (isLoading) {
-        return <div className="text-center text-xs p-4"><Loader2 className="h-4 w-4 animate-spin mx-auto"/></div>
-    }
-
+function OrderItemsList({ items }: { items: OrderItem[] }) {
     if (!items || items.length === 0) {
-        return <div className="text-center text-xs p-4 text-muted-foreground">Não foi possível carregar os itens deste pedido.</div>
+        return <div className="text-center text-xs p-4 text-muted-foreground">Não há itens neste pedido.</div>
     }
 
     return (
         <div className="space-y-3">
-            {items?.map(item => (
-                <div key={item.id} className="flex gap-3 items-center bg-black/30 p-2">
+            {items.map((item, index) => (
+                <div key={index} className="flex gap-3 items-center bg-black/30 p-2">
                     <Image src={item.image || 'https://placehold.co/60x80'} alt={item.name} width={60} height={80} className="object-cover border-2 border-primary/30"/>
                     <div className="flex-grow">
                         <p className="text-xs font-semibold text-primary">{item.name}</p>
@@ -211,7 +198,7 @@ export default function AccountPage() {
                                             </div>
                                         </AccordionTrigger>
                                         <AccordionContent>
-                                           <OrderItemCard orderId={order.id}/>
+                                           {order.items && <OrderItemsList items={order.items}/>}
                                         </AccordionContent>
                                     </AccordionItem>
                                 ))}

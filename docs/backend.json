@@ -167,6 +167,13 @@
         "shippingAddress": {
           "type": "object",
           "description": "Shipping address for the order."
+        },
+        "items": {
+          "type": "array",
+          "description": "List of items included in the order.",
+          "items": {
+            "$ref": "#/entities/OrderItem"
+          }
         }
       },
       "required": [
@@ -303,30 +310,6 @@
             {
               "name": "orderId",
               "description": "The unique identifier of the order."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/orders/{orderId}/order_items/{orderItemId}",
-        "definition": {
-          "entityName": "OrderItem",
-          "schema": {
-            "$ref": "#/backend/entities/OrderItem"
-          },
-          "description": "Stores order items for each order. Path-based ownership: Only the user with the matching userId can read/write their order items. Admins can also access all order items.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user who placed the order."
-            },
-            {
-              "name": "orderId",
-              "description": "The unique identifier of the order."
-            },
-            {
-              "name": "orderItemId",
-              "description": "The unique identifier of the order item."
             }
           ]
         }

@@ -9,7 +9,6 @@ export async function saveOrderAction(sessionId: string, userId: string) {
         throw new Error("ID da sessão ou ID do usuário ausente.");
     }
 
-    // A instância do firestore agora é importada diretamente
     try {
         const session = await stripe.checkout.sessions.retrieve(sessionId, {
             expand: ['line_items.data.price.product'],
@@ -23,6 +22,18 @@ export async function saveOrderAction(sessionId: string, userId: string) {
         if (!lineItems) {
             throw new Error('Itens do pedido não encontrados na sessão.');
         }
+
+        // Mapeia os itens da linha para o formato que será salvo no Firestore
+        const orderItems = lineItems.map(item => {
+            const product = item.price?.product as any; // 'any' para acessar as propriedades do objeto Stripe
+            return {
+                name: product.name,
+                quantity: item.quantity || 0,
+                price: item.price?.unit_amount ? item.price.unit_amount / 100 : 0,
+                // Garante que a imagem seja extraída corretamente
+                image: product.images && product.images.length > 0 ? product.images[0] : null,
+            };
+        });
 
         const orderData = {
             userId: userId,
@@ -40,24 +51,11 @@ export async function saveOrderAction(sessionId: string, userId: string) {
                     country: session.shipping_details.address?.country,
                 }
             } : null,
+            items: orderItems, // Salva os itens como um array dentro do pedido
         };
 
         const ordersRef = collection(firestore, 'users', userId, 'orders');
         const orderDocRef = await addDoc(ordersRef, orderData);
-
-        const orderItemsRef = collection(orderDocRef, 'order_items');
-        for (const item of lineItems) {
-            const product = item.price?.product as any; // 'any' para acessar as propriedades do objeto Stripe
-            if (item.quantity) {
-                 await addDoc(orderItemsRef, {
-                    name: product.name,
-                    quantity: item.quantity,
-                    price: item.price?.unit_amount ? item.price.unit_amount / 100 : 0,
-                    // Garante que a imagem seja extraída corretamente
-                    image: product.images && product.images.length > 0 ? product.images[0] : null,
-                });
-            }
-        }
 
         return { success: true, orderId: orderDocRef.id };
 

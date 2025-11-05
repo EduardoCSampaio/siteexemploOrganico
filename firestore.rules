@@ -1,7 +1,7 @@
 
 /**
  * @file TrendSight Boutique Firestore Security Rules
- * @version 2
+ * @version 3
  *
  * @Core Philosophy:
  * This ruleset implements a hybrid security model, balancing public read access for catalog browsing with strict user-ownership and admin-controlled write access for sensitive data. User data is isolated under their respective user IDs. Administrative privileges are granted based on the existence of a document in the `/roles_admin/{userId}` collection.
@@ -10,16 +10,16 @@
  * - `/users/{userId}`: User profile information, accessible only to the user themselves.
  * - `/clothing_items/{clothingItemId}`: Publicly readable catalog of clothing items, manageable only by admins.
  * - `/style_guides/{styleGuideId}`: Publicly readable collection of style guides, manageable only by admins.
- * - `/users/{userId}/orders/{orderId}`: Orders placed by a specific user, accessible only to the user and admins.
- * - `/users/{userId}/orders/{orderId}/order_items/{orderItemId}`: Items within a specific order, accessible only to the user who placed the order and admins.
+ * - `/users/{userId}/orders/{orderId}`: Orders placed by a specific user, accessible only to the user and admins. Items are stored in an array within the order.
  * - `/roles_admin/{userId}`: Collection to manage admin roles. The existence of a document indicates admin privileges.
  *
  * @Key Security Decisions:
  * - **Public Read Access**: The `clothing_items` and `style_guides` collections are publicly readable to allow for catalog browsing without authentication.
  * - **Admin-Only Writes**: Create, update, and delete operations on `clothing_items` and `style_guides` are restricted to users with admin privileges.
- * - **User-Owned Data**: User profiles and their associated orders and order items are strictly controlled, granting access only to the user themselves (and admins).
+ * - **User-Owned Data**: User profiles and their associated orders are strictly controlled, granting access only to the user themselves (and admins).
  * - **Admin Role Management**: Admin privileges are granted by the existence of a document in the `/roles_admin/{userId}` collection.
  * - **No User Listing**: Listing of all users is implicitly denied to prevent information disclosure.
+ * - **No Order Subcollections**: The `order_items` subcollection has been removed. Order items are now stored as an array within the order document itself. This simplifies data retrieval for clients but requires validation of the array content.
  */
 rules_version = '2';
 service cloud.firestore {
@@ -89,19 +89,6 @@ service cloud.firestore {
       allow get, list: if isOwner(userId) || isAdmin();
       allow create: if isOwner(userId);
       allow update, delete: if (isOwner(userId) && resource != null) || isAdmin();
-
-       /**
-       * @description: Allows admins to list all orders across all users.
-       * @path: /orders/{orderId} (collection group)
-       * @allow: Admin (list) can list all orders.
-       * @deny: Non-admin users cannot list all orders.
-       * @principle: Enables admin-level order management.
-       */
-      match /order_items/{orderItemId} {
-        allow get, list: if isOwner(userId) || isAdmin();
-        allow create: if isOwner(userId);
-        allow update, delete: if (isOwner(userId) && resource != null) || isAdmin();
-      }
     }
     
     match /{path=**}/orders/{orderId} {
