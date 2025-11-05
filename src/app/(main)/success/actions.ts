@@ -2,7 +2,7 @@
 
 import { stripe } from '@/lib/stripe';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
-import { firestore } from '@/firebase'; // Alterado para importação direta
+import { firestore } from '@/firebase';
 
 export async function saveOrderAction(sessionId: string, userId: string) {
     if (!sessionId || !userId) {
@@ -23,14 +23,12 @@ export async function saveOrderAction(sessionId: string, userId: string) {
             throw new Error('Itens do pedido não encontrados na sessão.');
         }
 
-        // Mapeia os itens da linha para o formato que será salvo no Firestore
         const orderItems = lineItems.map(item => {
-            const product = item.price?.product as any; // 'any' para acessar as propriedades do objeto Stripe
+            const product = item.price?.product as any;
             return {
                 name: product.name,
                 quantity: item.quantity || 0,
                 price: item.price?.unit_amount ? item.price.unit_amount / 100 : 0,
-                // Garante que a imagem seja extraída corretamente
                 image: product.images && product.images.length > 0 ? product.images[0] : null,
             };
         });
@@ -39,7 +37,7 @@ export async function saveOrderAction(sessionId: string, userId: string) {
             userId: userId,
             orderDate: serverTimestamp(),
             totalAmount: session.amount_total ? session.amount_total / 100 : 0,
-            status: 'processing', // Status inicial
+            status: 'processing',
             shippingAddress: session.shipping_details ? {
                 name: session.shipping_details.name,
                 address: {
@@ -51,7 +49,7 @@ export async function saveOrderAction(sessionId: string, userId: string) {
                     country: session.shipping_details.address?.country,
                 }
             } : null,
-            items: orderItems, // Salva os itens como um array dentro do pedido
+            items: orderItems,
         };
 
         const ordersRef = collection(firestore, 'users', userId, 'orders');
