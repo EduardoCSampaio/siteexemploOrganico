@@ -1,7 +1,5 @@
 'use client';
 import { useUser, useFirestore, useCollection, useDoc } from '@/firebase';
-import { useRouter } from 'next/navigation';
-import { useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Loader2, DollarSign, ShoppingCart, Users, Package, ShieldAlert } from 'lucide-react';
 import { useMemoFirebase } from '@/firebase/provider';
@@ -11,6 +9,7 @@ import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useMemo } from 'react';
 
 interface Order {
   id: string;
@@ -111,19 +110,19 @@ function DashboardContent() {
     const firestore = useFirestore();
 
     const allOrdersQuery = useMemoFirebase(
-      () => query(collectionGroup(firestore, 'orders')),
+      () => (firestore ? query(collectionGroup(firestore, 'orders')) : null),
       [firestore]
     );
     const { data: allOrders, isLoading: areOrdersLoading } = useCollection<Order>(allOrdersQuery);
   
     const recentOrdersQuery = useMemoFirebase(
-      () => query(collectionGroup(firestore, 'orders'), orderBy('orderDate', 'desc'), limit(5)),
+      () => (firestore ? query(collectionGroup(firestore, 'orders'), orderBy('orderDate', 'desc'), limit(5)) : null),
       [firestore]
     );
     const { data: recentOrders, isLoading: areRecentOrdersLoading } = useCollection<Order>(recentOrdersQuery);
   
     const usersQuery = useMemoFirebase(
-      () => collection(firestore, 'users'),
+      () => (firestore ? collection(firestore, 'users') : null),
       [firestore]
     );
     const { data: users, isLoading: areUsersLoading } = useCollection(usersQuery);
@@ -173,8 +172,9 @@ export default function AdminDashboardPage() {
     [firestore, user?.uid]
   );
   const { data: adminRole, isLoading: isAdminRoleLoading } = useDoc(adminRoleRef);
-  const isAdmin = adminRole !== null && adminRole !== undefined;
   
+  const isAdmin = adminRole !== null && adminRole !== undefined;
+
   if (isUserLoading || isAdminRoleLoading) {
     return (
         <div className="flex items-center justify-center h-full">
@@ -193,7 +193,7 @@ export default function AdminDashboardPage() {
                 <ShieldAlert className="mx-auto h-12 w-12 text-destructive" />
                 <h3 className="mt-4 text-lg font-bold text-destructive">Acesso Negado</h3>
                 <p className="mt-2 text-sm text-muted-foreground">Você não tem permissão para acessar o dashboard.</p>
-                <p className="mt-1 text-xs text-muted-foreground">Se você deveria ser um admin, tente usar a página de promoção.</p>
+                <p className="mt-1 text-xs text-muted-foreground">Se você acredita que isso é um erro, contate o suporte.</p>
             </div>
         </div>
     );
