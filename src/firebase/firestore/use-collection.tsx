@@ -46,10 +46,11 @@ export function useCollection<T = any>(
       setIsLoading(false); // Not loading because there is nothing to fetch.
       setData(null);
       setError(null);
-      return;
+      return; // Stop execution of the effect.
     }
 
     setIsLoading(true);
+    setError(null);
     // A valid reference is present, set up the listener.
     const unsubscribe = onSnapshot(
       memoizedTargetRefOrQuery,
