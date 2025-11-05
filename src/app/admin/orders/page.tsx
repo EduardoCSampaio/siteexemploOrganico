@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { collectionGroup, query, getDocs } from 'firebase/firestore';
+import { collectionGroup, query, getDocs, orderBy } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import {
@@ -74,13 +74,13 @@ export default function AdminOrdersPage() {
 
       setIsLoading(true);
       try {
-        const ordersQuery = query(collectionGroup(firestore, 'orders'));
+        const ordersQuery = query(collectionGroup(firestore, 'orders'), orderBy('orderDate', 'asc'));
         const querySnapshot = await getDocs(ordersQuery);
         const ordersData = querySnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
         } as Order));
-        setOrders(ordersData);
+        setOrders(ordersData.sort((a, b) => b.orderDate.seconds - a.orderDate.seconds));
       } catch (error) {
         console.error("Failed to fetch orders:", error);
       } finally {
@@ -112,7 +112,7 @@ export default function AdminOrdersPage() {
             </TableHeader>
             <TableBody>
                 {isLoading && Array.from({length: 5}).map((_, i) => <OrderRowSkeleton key={i} />)}
-                {!isLoading && orders?.sort((a,b) => b.orderDate.seconds - a.orderDate.seconds).map((order) => (
+                {!isLoading && orders?.map((order) => (
                 <TableRow key={order.id}>
                     <TableCell>{format(new Date(order.orderDate.seconds * 1000), 'dd/MM/yyyy HH:mm')}</TableCell>
                     <TableCell>{order.shippingAddress?.name || 'Não informado'}</TableCell>

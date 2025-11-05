@@ -135,10 +135,10 @@ export default function AdminDashboardPage() {
                 setStats({ totalRevenue, orderCount, userCount });
 
                 // Fetch recent orders
-                const recentOrdersQuery = query(collectionGroup(firestore, 'orders'), orderBy('orderDate', 'desc'), limit(5));
+                const recentOrdersQuery = query(collectionGroup(firestore, 'orders'), orderBy('orderDate', 'asc'), limit(5));
                 const recentOrdersSnapshot = await getDocs(recentOrdersQuery);
                 const recentOrdersData = recentOrdersSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Order));
-                setRecentOrders(recentOrdersData);
+                setRecentOrders(recentOrdersData.sort((a, b) => b.orderDate.seconds - a.orderDate.seconds));
 
             } catch (error) {
                 console.error("Error fetching dashboard data:", error);
