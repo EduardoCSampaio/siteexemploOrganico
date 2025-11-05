@@ -40,14 +40,16 @@ export function useCollection<T = any>(
   const [error, setError] = useState<FirestoreError | Error | null>(null);
 
   useEffect(() => {
-    // If the reference is not yet available, set loading state and wait.
+    // CRITICAL FIX: If the query/ref is null or undefined, do nothing.
+    // This prevents the hook from attempting a root query.
     if (!memoizedTargetRefOrQuery) {
-      setIsLoading(true);
+      setIsLoading(false); // Not loading because there is nothing to fetch.
       setData(null);
       setError(null);
       return;
     }
 
+    setIsLoading(true);
     // A valid reference is present, set up the listener.
     const unsubscribe = onSnapshot(
       memoizedTargetRefOrQuery,
