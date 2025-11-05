@@ -67,6 +67,8 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
     userError: null,
   });
 
+  const servicesAvailable = !!(firebaseApp && firestore && auth);
+
   // Effect to subscribe to Firebase auth state changes
   useEffect(() => {
     if (!auth) { // If no Auth service instance, cannot determine user state
@@ -89,7 +91,6 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
 
   // Memoize the context value
   const contextValue = useMemo((): FirebaseContextState => {
-    const servicesAvailable = !!(firebaseApp && firestore && auth);
     return {
       areServicesAvailable: servicesAvailable,
       firebaseApp: servicesAvailable ? firebaseApp : null,
@@ -99,13 +100,16 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
       isUserLoading: userAuthState.isUserLoading,
       userError: userAuthState.userError,
     };
-  }, [firebaseApp, firestore, auth, userAuthState]);
+  }, [servicesAvailable, firebaseApp, firestore, auth, userAuthState]);
+
+  // CRITICAL FIX: Render children only when both services are available AND user loading is complete.
+  // This prevents race conditions where components try to use Firestore before it's ready.
+  const canRenderChildren = servicesAvailable && !userAuthState.isUserLoading;
 
   return (
     <FirebaseContext.Provider value={contextValue}>
       <FirebaseErrorListener />
-      {/* Only render children when the initial user loading is complete */}
-      {!userAuthState.isUserLoading && children}
+      {canRenderChildren ? children : null}
     </FirebaseContext.Provider>
   );
 };
