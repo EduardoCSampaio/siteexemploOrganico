@@ -111,19 +111,19 @@ function DashboardContent() {
     const firestore = useFirestore();
 
     const allOrdersQuery = useMemoFirebase(
-      () => (firestore ? query(collectionGroup(firestore, 'orders')) : null),
+      () => query(collectionGroup(firestore, 'orders')),
       [firestore]
     );
     const { data: allOrders, isLoading: areOrdersLoading } = useCollection<Order>(allOrdersQuery);
   
     const recentOrdersQuery = useMemoFirebase(
-      () => (firestore ? query(collectionGroup(firestore, 'orders'), orderBy('orderDate', 'desc'), limit(5)) : null),
+      () => query(collectionGroup(firestore, 'orders'), orderBy('orderDate', 'desc'), limit(5)),
       [firestore]
     );
     const { data: recentOrders, isLoading: areRecentOrdersLoading } = useCollection<Order>(recentOrdersQuery);
   
     const usersQuery = useMemoFirebase(
-      () => (firestore ? collection(firestore, 'users') : null),
+      () => collection(firestore, 'users'),
       [firestore]
     );
     const { data: users, isLoading: areUsersLoading } = useCollection(usersQuery);
