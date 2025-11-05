@@ -1,16 +1,15 @@
 'use server';
 
 import { stripe } from '@/lib/stripe';
-import { addDoc, collection, serverTimestamp, doc } from 'firebase/firestore';
-import { getSdks } from '@/firebase';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { firestore } from '@/firebase'; // Alterado para importação direta
 
 export async function saveOrderAction(sessionId: string, userId: string) {
     if (!sessionId || !userId) {
         throw new Error("ID da sessão ou ID do usuário ausente.");
     }
 
-    const { firestore } = getSdks();
-
+    // A instância do firestore agora é importada diretamente
     try {
         const session = await stripe.checkout.sessions.retrieve(sessionId, {
             expand: ['line_items.data.price.product'],
@@ -48,7 +47,7 @@ export async function saveOrderAction(sessionId: string, userId: string) {
 
         const orderItemsRef = collection(orderDocRef, 'order_items');
         for (const item of lineItems) {
-            const product = item.price?.product as any; // 'any' to access Stripe object properties
+            const product = item.price?.product as any; // 'any' para acessar as propriedades do objeto Stripe
             if (item.quantity) {
                  await addDoc(orderItemsRef, {
                     name: product.name,

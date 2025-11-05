@@ -7,9 +7,9 @@ import { Firestore, getFirestore } from 'firebase/firestore';
 
 let firebaseApp: FirebaseApp;
 
-// Direct initialization: Always use the config object.
-// This resolves the race condition where components would try to use Firebase
-// before the fallback initialization was complete.
+// A inicialização direta usa sempre o objeto de configuração.
+// Isso resolve a condição de corrida onde os componentes tentavam usar o Firebase
+// antes que a inicialização de fallback estivesse completa.
 if (!getApps().length) {
   firebaseApp = initializeApp(firebaseConfig);
 } else {
@@ -19,10 +19,10 @@ if (!getApps().length) {
 const auth = getAuth(firebaseApp);
 const firestore = getFirestore(firebaseApp);
 
-// Export the initialized instances
-export { firebaseApp, auth, firestore };
+// Exporta as instâncias inicializadas
+export { firebaseApp, auth, firestore, getApp };
 
-// This function is kept for any potential legacy dependencies but is no longer the primary init method.
+// Esta função é mantida para quaisquer dependências legadas em potencial, mas não é mais o método de inicialização principal.
 export function getSdks(app: FirebaseApp) {
   return {
     firebaseApp: app,
