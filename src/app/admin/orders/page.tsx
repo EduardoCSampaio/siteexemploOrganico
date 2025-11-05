@@ -74,12 +74,13 @@ export default function AdminOrdersPage() {
 
       setIsLoading(true);
       try {
-        const ordersQuery = query(collectionGroup(firestore, 'orders'), orderBy('orderDate', 'asc'));
+        const ordersQuery = query(collectionGroup(firestore, 'orders'));
         const querySnapshot = await getDocs(ordersQuery);
         const ordersData = querySnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
         } as Order));
+        // Sort client-side
         setOrders(ordersData.sort((a, b) => b.orderDate.seconds - a.orderDate.seconds));
       } catch (error) {
         console.error("Failed to fetch orders:", error);
