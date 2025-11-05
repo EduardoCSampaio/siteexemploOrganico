@@ -1,5 +1,7 @@
 import type { ImagePlaceholder } from './placeholder-images';
 import { PlaceHolderImages } from './placeholder-images';
+import { firestore } from '@/firebase'; // Importe a instância do firestore
+import { collection, getDocs } from 'firebase/firestore';
 
 const imageMap = PlaceHolderImages.reduce((acc, img) => {
   acc[img.id] = img;
@@ -27,9 +29,37 @@ export interface StyleGuide {
   image: ImagePlaceholder;
 }
 
+// Função para buscar produtos do Firestore
+export async function getProductsFromFirestore(): Promise<Product[]> {
+  const productsCollection = collection(firestore, 'clothing_items');
+  const productSnapshot = await getDocs(productsCollection);
+  const productList = productSnapshot.docs.map(doc => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      name: data.name || '',
+      description: data.description || '',
+      price: data.price || 0,
+      category: data.category || 'N/A',
+      // A imagem é um objeto, então precisamos acessar imageUrl e imageHint
+      image: {
+        id: doc.id,
+        imageUrl: data.image?.imageUrl || 'https://placehold.co/600x900',
+        imageHint: data.image?.imageHint || 'clothing item',
+        description: data.name || ''
+      },
+      sizes: data.sizes || [],
+      colors: data.colors || [],
+      // Adicione outros campos que possam existir no seu documento
+    } as Product;
+  });
+  return productList;
+}
+
+
 export const products: Product[] = [
   // This data is now fetched from Firestore, but we keep it here for reference
-  // and potential fallback. The AI-related flows still use this static data.
+  // and potential fallback.
   {
     id: 'prod-1',
     name: 'Vestido de Noite Escarlate',

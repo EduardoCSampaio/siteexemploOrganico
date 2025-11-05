@@ -81,7 +81,7 @@ export function StyleAdvisorClient() {
         <Card>
           <CardHeader>
             <CardTitle>Gerador de Looks</CardTitle>
-            <CardDescription>Diga-nos a ocasião e criaremos o look perfeito.</CardDescription>
+            <CardDescription>Diga-nos a ocasião e criaremos o look perfeito com peças da nossa loja.</CardDescription>
           </CardHeader>
           <Form {...outfitForm}>
             <form onSubmit={outfitForm.handleSubmit(onOutfitSubmit)}>
@@ -137,23 +137,23 @@ export function StyleAdvisorClient() {
               <p className="mb-6 text-sm text-muted-foreground leading-relaxed">{outfit.outfitDescription}</p>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {outfit.items.map((item, index) => (
-                  <Card key={index} className="overflow-hidden">
+                  <Card key={index} className="overflow-hidden flex flex-col">
                      <div className="p-2 border-b-2 border-primary/30">
                         <h4 className="font-semibold text-xs text-primary truncate">{item.name}</h4>
                      </div>
-                    <CardContent className="p-2">
-                       <div className="bg-black border-2 border-primary/30 p-1">
-                            <Image src={item.imageUrl} alt={item.name} width={400} height={500} className="w-full object-cover" data-ai-hint="clothing item"/>
+                    <CardContent className="p-2 flex-grow">
+                       <div className="bg-black border-2 border-primary/30 p-1 h-full">
+                            <Image src={item.imageUrl || 'https://placehold.co/400x500'} alt={item.name} width={400} height={500} className="w-full h-full object-cover" data-ai-hint="clothing item"/>
                        </div>
                     </CardContent>
-                    <div className="p-2 space-y-2">
-                      <p className="text-xs text-muted-foreground leading-snug">{item.description}</p>
-                      <div className="flex justify-between items-center text-xs">
+                    <div className="p-2 space-y-2 mt-auto">
+                      <p className="text-xs text-muted-foreground leading-snug line-clamp-2">{item.description}</p>
+                      <div className="flex justify-between items-center text-xs pt-2">
                          <span className="text-muted-foreground">PREÇO:</span>
                          <span className="font-bold text-primary">R$ {item.price.toFixed(2).replace('.', ',')}</span>
                       </div>
                        <Button variant="outline" size="sm" className="w-full text-xs" asChild>
-                          <Link href={`/products/${(item as any).id}`}>Ver Item</Link>
+                          <Link href={`/products/${item.id}`}>Ver Item</Link>
                        </Button>
                     </div>
                   </Card>
@@ -169,7 +169,7 @@ export function StyleAdvisorClient() {
         <Card>
           <CardHeader>
             <CardTitle>Personal Shopper</CardTitle>
-            <CardDescription>Descreva seu estilo e receba sugestões.</CardDescription>
+            <CardDescription>Descreva seu estilo e receba sugestões de peças da nossa loja.</CardDescription>
           </CardHeader>
           <Form {...recommendationsForm}>
             <form onSubmit={recommendationsForm.handleSubmit(onRecommendationsSubmit)}>
@@ -213,7 +213,7 @@ export function StyleAdvisorClient() {
                     {recommendations.recommendations.map((rec, index) => (
                         <li key={index} className="flex items-start text-xs leading-relaxed text-muted-foreground">
                            <span className="text-primary mr-2">»</span>
-                           <span>{rec}</span>
+                           <span dangerouslySetInnerHTML={{ __html: rec.replace(/\*\*(.*?)\*\*/g, '<strong class="text-primary/90">$1</strong>') }} />
                         </li>
                     ))}
                 </ul>

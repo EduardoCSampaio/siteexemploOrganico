@@ -17,10 +17,12 @@ const GenerateOutfitInspirationInputSchema = z.object({
     .string()
     .optional()
     .describe('Preferências opcionais do usuário para o look, como estilos, cores ou marcas preferidas.'),
+  itemAvailability: z.string().describe('Uma lista de itens de vestuário disponíveis e seus detalhes.'),
 });
 export type GenerateOutfitInspirationInput = z.infer<typeof GenerateOutfitInspirationInputSchema>;
 
 const ClothingItemSchema = z.object({
+  id: z.string().describe('O ID do item de vestuário da loja.'),
   name: z.string().describe('O nome do item de vestuário.'),
   description: z.string().describe('Uma breve descrição do item.'),
   imageUrl: z.string().describe('URL da imagem do item de vestuário.'),
@@ -31,7 +33,7 @@ const ClothingItemSchema = z.object({
 
 const GenerateOutfitInspirationOutputSchema = z.object({
   outfitDescription: z.string().describe('Uma descrição do look recomendado.'),
-  items: z.array(ClothingItemSchema).describe('Um array de itens de vestuário no look.'),
+  items: z.array(ClothingItemSchema).describe('Um array de itens de vestuário no look, retirados EXCLUSIVAMENTE da lista de itens disponíveis.'),
 });
 export type GenerateOutfitInspirationOutput = z.infer<typeof GenerateOutfitInspirationOutputSchema>;
 
@@ -47,16 +49,23 @@ const prompt = ai.definePrompt({
   output: {schema: GenerateOutfitInspirationOutputSchema},
   prompt: `Você é um estilista pessoal da Organico. Um usuário está procurando um look para uma ocasião específica.
 
+  Sua tarefa é montar um look completo e estiloso usando APENAS os itens do estoque disponível.
+
+  Estoque Disponível (Use SOMENTE estes itens):
+  ---
+  {{{itemAvailability}}}
+  ---
+
+  Pedido do Usuário:
   Ocasião: {{{occasion}}}
   Preferências do Usuário: {{{userPreferences}}}
 
-  Recomende um look que seja apropriado para a ocasião e incorpore as preferências do usuário, se fornecidas. O look deve incluir itens específicos da Organico.
-  Descreva o look e liste os itens de vestuário individuais com seus nomes, descrições, URLs de imagem, preços, tamanhos e cores disponíveis.
-  Formate sua resposta como um objeto JSON que esteja em conformidade com o esquema para GenerateOutfitInspirationOutputSchema.
-
-  Considere as tendências da moda atuais e o estoque da boutique ao fazer suas recomendações.
-  Garanta que as URLs das imagens fornecidas sejam válidas e apontem para imagens reais dos itens de vestuário.
-  Exemplo de URL de imagem: https://example.com/images/dress123.jpg
+  Instruções:
+  1. Analise o pedido do usuário e o estoque disponível.
+  2. Crie uma descrição geral para o look recomendado que seja apropriada para a ocasião e incorpore as preferências do usuário, se possível.
+  3. Selecione de 2 a 4 itens do estoque para compor o look.
+  4. Para CADA item selecionado, você DEVE retornar o ID, nome, descrição, preço, tamanhos e cores EXATAMENTE como aparecem na lista de estoque. Não invente informações.
+  5. Formate sua resposta como um objeto JSON que esteja em conformidade com o esquema GenerateOutfitInspirationOutputSchema. O campo "items" deve conter um array com os objetos de cada item do look.
   `,
 });
 
