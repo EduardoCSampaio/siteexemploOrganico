@@ -102,6 +102,7 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
     };
   }, [servicesAvailable, firebaseApp, firestore, auth, userAuthState]);
 
+  // CRITICAL FIX: Only render children when both services are available AND auth check is complete.
   const canRenderChildren = servicesAvailable && !userAuthState.isUserLoading;
 
   return (
