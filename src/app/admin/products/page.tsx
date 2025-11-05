@@ -1,14 +1,14 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   collection,
   doc,
   deleteDoc,
+  getDocs
 } from 'firebase/firestore';
-import { useCollection, useFirestore, useUser } from '@/firebase';
+import { useFirestore } from '@/firebase';
 import { Product } from '@/lib/data';
-import { useMemoFirebase } from '@/firebase/provider';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -38,7 +38,7 @@ import { errorEmitter } from '@/firebase/error-emitter';
 function ProductRowSkeleton() {
     return (
       <TableRow>
-        <TableCell><Skeleton className="h-10 w-10 rounded-full" /></TableCell>
+        <TableCell><Skeleton className="h-10 w-10 rounded-md" /></TableCell>
         <TableCell><Skeleton className="h-5 w-32" /></TableCell>
         <TableCell><Skeleton className="h-5 w-24" /></TableCell>
         <TableCell><Skeleton className="h-5 w-20" /></TableCell>
@@ -52,14 +52,32 @@ function ProductRowSkeleton() {
 
 export default function AdminProductsPage() {
   const firestore = useFirestore();
-  const productsQuery = useMemoFirebase(
-    () => (firestore ? collection(firestore, 'clothing_items') : null),
-    [firestore]
-  );
-  const { data: products, isLoading } = useCollection<Product>(productsQuery);
   const router = useRouter();
   const { toast } = useToast();
+  
+  const [products, setProducts] = useState<Product[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
+
+  async function fetchProducts() {
+      if (!firestore) return;
+      setIsLoading(true);
+      try {
+          const productsQuery = collection(firestore, 'clothing_items');
+          const querySnapshot = await getDocs(productsQuery);
+          const productsData = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Product));
+          setProducts(productsData);
+      } catch (error) {
+          console.error("Failed to fetch products:", error);
+      } finally {
+          setIsLoading(false);
+      }
+  }
+
+  useEffect(() => {
+    fetchProducts();
+  }, [firestore]);
+
 
   const handleDeleteProduct = async () => {
     if (!productToDelete || !firestore) return;
@@ -69,6 +87,7 @@ export default function AdminProductsPage() {
     deleteDoc(docRef)
       .then(() => {
         toast({ title: 'Produto excluído com sucesso!' });
+        fetchProducts(); // Re-fetch products after deletion
       })
       .catch(error => {
         const permissionError = new FirestorePermissionError({
@@ -161,6 +180,11 @@ export default function AdminProductsPage() {
             ))}
           </TableBody>
         </Table>
+         {!isLoading && products?.length === 0 && (
+            <div className="text-center p-8 text-sm text-muted-foreground">
+                Nenhum produto encontrado.
+            </div>
+        )}
       </div>
     </div>
   );

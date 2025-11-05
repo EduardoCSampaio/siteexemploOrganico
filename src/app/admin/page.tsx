@@ -1,15 +1,15 @@
 'use client';
-import { useFirestore, useCollection } from '@/firebase';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { DollarSign, ShoppingCart, Users, Package } from 'lucide-react';
-import { useMemoFirebase } from '@/firebase/provider';
-import { collection, query, limit, orderBy, collectionGroup } from 'firebase/firestore';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useMemo } from 'react';
+import { useEffect, useState } from 'react';
+import { useFirestore } from '@/firebase';
+import { collectionGroup, getDocs, query, orderBy, limit, collection } from 'firebase/firestore';
+
 
 interface Order {
   id: string;
@@ -109,55 +109,72 @@ function RecentOrders({ orders, isLoading }: { orders: Order[] | null, isLoading
 export default function AdminDashboardPage() {
     const firestore = useFirestore();
 
-    const allOrdersQuery = useMemoFirebase(
-      () => (firestore ? query(collectionGroup(firestore, 'orders')) : null),
-      [firestore]
-    );
-    const { data: allOrders, isLoading: areOrdersLoading } = useCollection<Order>(allOrdersQuery);
-  
-    const recentOrdersQuery = useMemoFirebase(
-      () => (firestore ? query(collectionGroup(firestore, 'orders'), orderBy('orderDate', 'desc'), limit(5)) : null),
-      [firestore]
-    );
-    const { data: recentOrders, isLoading: areRecentOrdersLoading } = useCollection<Order>(recentOrdersQuery);
-  
-    const usersQuery = useMemoFirebase(
-      () => (firestore ? collection(firestore, 'users') : null),
-      [firestore]
-    );
-    const { data: users, isLoading: areUsersLoading } = useCollection(usersQuery);
-  
-    const totalRevenue = useMemo(() => {
-      if (!allOrders) return 0;
-      return allOrders.reduce((acc, order) => acc + order.totalAmount, 0);
-    }, [allOrders]);
+    const [stats, setStats] = useState<{ totalRevenue: number; orderCount: number; userCount: number; }>({ totalRevenue: 0, orderCount: 0, userCount: 0 });
+    const [recentOrders, setRecentOrders] = useState<Order[] | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-    const isLoadingStats = areOrdersLoading || areUsersLoading;
+    useEffect(() => {
+        async function fetchData() {
+            if (!firestore) return;
+
+            setIsLoading(true);
+            try {
+                // Fetch all orders for stats
+                const allOrdersQuery = query(collectionGroup(firestore, 'orders'));
+                const allOrdersSnapshot = await getDocs(allOrdersQuery);
+                const allOrdersData = allOrdersSnapshot.docs.map(doc => doc.data() as Order);
+                
+                const totalRevenue = allOrdersData.reduce((acc, order) => acc + order.totalAmount, 0);
+                const orderCount = allOrdersData.length;
+
+                // Fetch all users for stats
+                const usersQuery = collection(firestore, 'users');
+                const usersSnapshot = await getDocs(usersQuery);
+                const userCount = usersSnapshot.size;
+
+                setStats({ totalRevenue, orderCount, userCount });
+
+                // Fetch recent orders
+                const recentOrdersQuery = query(collectionGroup(firestore, 'orders'), orderBy('orderDate', 'desc'), limit(5));
+                const recentOrdersSnapshot = await getDocs(recentOrdersQuery);
+                const recentOrdersData = recentOrdersSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Order));
+                setRecentOrders(recentOrdersData);
+
+            } catch (error) {
+                console.error("Error fetching dashboard data:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        fetchData();
+    }, [firestore]);
+
 
     return (
         <div className="space-y-6">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 <StatCard 
                     title="Receita Total"
-                    value={`R$ ${totalRevenue.toFixed(2).replace('.', ',')}`}
+                    value={`R$ ${stats.totalRevenue.toFixed(2).replace('.', ',')}`}
                     icon={DollarSign}
-                    isLoading={isLoadingStats}
+                    isLoading={isLoading}
                 />
                 <StatCard 
                     title="Pedidos"
-                    value={allOrders?.length ?? 0}
+                    value={stats.orderCount}
                     icon={ShoppingCart}
-                    isLoading={isLoadingStats}
+                    isLoading={isLoading}
                 />
                 <StatCard 
                     title="Clientes"
-                    value={users?.length ?? 0}
+                    value={stats.userCount}
                     icon={Users}
-                    isLoading={isLoadingStats}
+                    isLoading={isLoading}
                 />
             </div>
             <div>
-                <RecentOrders orders={recentOrders} isLoading={areRecentOrdersLoading} />
+                <RecentOrders orders={recentOrders} isLoading={isLoading} />
             </div>
         </div>
     )

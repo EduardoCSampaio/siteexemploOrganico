@@ -1,9 +1,8 @@
 'use client';
-import { useMemo } from 'react';
-import { collectionGroup, query } from 'firebase/firestore';
-import { useCollection, useFirestore, useUser } from '@/firebase';
+import { useEffect, useState } from 'react';
+import { collectionGroup, query, getDocs } from 'firebase/firestore';
+import { useFirestore } from '@/firebase';
 import { useRouter } from 'next/navigation';
-import { useMemoFirebase } from '@/firebase/provider';
 import {
   Table,
   TableBody,
@@ -66,13 +65,31 @@ function OrderRowSkeleton() {
 export default function AdminOrdersPage() {
   const firestore = useFirestore();
   const router = useRouter();
+  const [orders, setOrders] = useState<Order[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Use a collection group query to get all orders from all users
-  const ordersQuery = useMemoFirebase(
-    () => (firestore ? query(collectionGroup(firestore, 'orders')) : null),
-    [firestore]
-  );
-  const { data: orders, isLoading } = useCollection<Order>(ordersQuery);
+  useEffect(() => {
+    async function fetchOrders() {
+      if (!firestore) return;
+
+      setIsLoading(true);
+      try {
+        const ordersQuery = query(collectionGroup(firestore, 'orders'));
+        const querySnapshot = await getDocs(ordersQuery);
+        const ordersData = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        } as Order));
+        setOrders(ordersData);
+      } catch (error) {
+        console.error("Failed to fetch orders:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchOrders();
+  }, [firestore]);
+
 
   return (
     <Card>
